@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from api.auth import router as router_auth
-from api.dashboard import router as router_dashboard
+from routers.auth import router as router_auth
+from routers.dashboard import router as router_dashboard
 import os
 from os.path import dirname, abspath
 
