@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}
+      <title>BetterMe</title>
+    {% endblock %}
+</head>
+<body>
+    {% block sidebar_left %}
+    <nav class="sidebar_left">
+        <h1>Меню</h1>
+        <a href="/dashboard">Главная</a>
+        <a href="/#">Список привычек</a>
+        <a href="/#">Отслеживание привычек</a>
+    </nav>
+    {% endblock %}
+    {% block sidebar_right %}
+    <div class="sidebar_right">
+        
+    </div>
+    {% endblock %}
+    {% block content %}{% endblock %}
+</body>
+</html>

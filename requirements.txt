@@ -1,0 +1,6 @@
+fastapi[all]
+jinja2
+requests
+sqlalchemy
+alembic
+asyncpg
