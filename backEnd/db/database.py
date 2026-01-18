@@ -10,7 +10,10 @@ engine=create_async_engine(DATABASE_URL)
 async_session_maker=async_sessionmaker(engine, expire_on_commit=False)
 
 created_at=Annotated[datetime, mapped_column(server_default=func.now())]
-updated_at = Annotated[datetime, mapped_column(server_default=func.now(), onupdate=datetime.now)]
+updated_at=Annotated[datetime, mapped_column(server_default=func.now(), onupdate=datetime.now)]
+int_pk=Annotated[int,mapped_column(primary_key=True)]
+str_uniq=Annotated[str, mapped_column(unique=True, nullable=False)]
+int_null_true = Annotated[int, mapped_column(nullable=True)]
 
 class Base(AsyncAttrs, DeclarativeBase):
     __abstract__=True
