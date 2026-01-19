@@ -1,0 +1,6 @@
+__pycache__
+FastVenv/
+.git
+.gitignore
+.dockerignore
+Dockerfile

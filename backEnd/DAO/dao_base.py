@@ -1,5 +1,5 @@
 from typing import Generic, TypeVar, Type
-from backEnd.db.database import Base
+from backend.db.database import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
 
