@@ -30,7 +30,8 @@ class Habit(Base):
     id: Mapped[int_pk]
     name: Mapped[str_uniq]
     description: Mapped[str]=mapped_column(Text)
-    complit: Mapped[bool]
+    complit: Mapped[bool]=mapped_column(default=False)
+    complit_today: Mapped[bool]=mapped_column(default=False)
     goal: Mapped[int_null_true]
     progress: Mapped[int_null_true]
 

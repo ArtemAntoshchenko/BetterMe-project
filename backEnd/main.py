@@ -10,6 +10,8 @@ base_dir=os.path.dirname(os.path.abspath(__file__))
 html_path=os.path.join(base_dir,'..','frontEnd','public','landing','index.html')
 
 app=FastAPI()
+app.include_router(router_auth)
+app.include_router(router_dashboard)
 
 if os.path.exists(html_path):
     app.mount('/', StaticFiles(directory=os.path.dirname(html_path), html=True))
@@ -19,30 +21,6 @@ else:
 async def landing_page():
     return FileResponse(html_path)
 
-# base_dir=os.path.dirname(os.path.abspath(__file__))
-# html_path1=os.path.join(base_dir,'..','frontEnd','public','main_pages','dashboard.html')
 
-# if os.path.exists(html_path):
-#     app.mount('/', StaticFiles(directory=os.path.dirname(html_path1), html=True))
-# else:
-#     print(f'файл не найден:{html_path1}')
+# https://gamma.app/ru
 
-# @app.get("/debug")
-# async def debug():
-#     """Проверка путей и доступности файлов"""
-#     import os
-    
-#     base_dir = os.path.dirname(os.path.abspath(__file__))
-#     templates_dir = os.path.join(base_dir, "templates")
-    
-#     return {
-#         "base_dir": base_dir,
-#         "templates_dir": templates_dir,
-#         "html_exists": os.path.exists(html_path1),
-#         "html_path": html_path1,
-#         "current_working_dir": os.getcwd(),
-#         "__file__": __file__
-#     }
-
-app.include_router(router_auth)
-app.include_router(router_dashboard)
