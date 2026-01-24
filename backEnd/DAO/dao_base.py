@@ -1,5 +1,5 @@
 from typing import Generic, TypeVar, Type
-from backend.db.database import Base, get_db
+from db.database import Base, get_db
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
