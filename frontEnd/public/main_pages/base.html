@@ -6,14 +6,19 @@
     {% block title %}
       <title>BetterMe</title>
     {% endblock %}
+    <style>
+        td {padding:5px;}
+        button {margin: 5px;}
+        th {padding:5px; font-size: large;}
+    </style>
 </head>
 <body>
     {% block sidebar_left %}
     <nav class="sidebar_left">
-        <h1>Меню</h1>
-        <a href="/dashboard">Главная</a>
-        <a href="/#">Список привычек</a>
-        <a href="/#">Отслеживание привычек</a>
+        <h1>Навигация по сайту:</h1>
+        <a href="/dashboard/main">Главная</a><br>
+        <a href="/habits/main">Список привычек</a><br>
+        <a href="/tracking/main">Отслеживание привычек</a><br>
     </nav>
     {% endblock %}
     {% block sidebar_right %}

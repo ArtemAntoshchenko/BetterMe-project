@@ -1,11 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}
+    <title>Habits</title>
+{% endblock %}
+{% block content %}
+    <h2>Все привычки:</h2>
+    <table>
+        <thead><tr><th>Название</th><th>Описание</th><th>Цель</th><th>Прогресс</th><th>Состояние</th></tr></thead>
+        <tbody align="center" id="tbodyHabits">
+        </tbody>
+    </table>
+    <h2>Активные привычки:</h2>
+    <table>
+        <thead><tr><th>Название</th><th>Описание</th><th>Цель</th><th>Прогресс</th><th>Состояние</th><th>Состояние на сегодня</th></tr></thead>
+        <tbody align="center" id="tbodyActiveHabits">
+        </tbody>
+    </table>
+{% endblock %}
+<script src="{{js_url}}/habits.js"></script>
