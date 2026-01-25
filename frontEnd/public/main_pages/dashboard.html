@@ -2,6 +2,34 @@
 {% block title %}
     <title>Dashboard</title>
 {% endblock %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.css"/>
+{% block sidebar_right %}
+<div class="container">
+    <div class="columns">
+        <div class="column is-offset-4 is-4">
+            <div class="box">
+                <article class="media">
+                    <div class="media-right">
+                        <figure class="image is-50x50">
+                            <img src="http://openweathermap.org/img/w/{{ weather_info.icon }}.png" alt="Image">
+                        </figure>
+                    </div>
+                    <div class="media-right">
+                        <div class="content">
+                            <p>
+                                <br>
+                                <span class="subtitle">{{ weather_info.temperature }}°C</span>
+                                <br> {{ weather_info.description }}
+                                <br> {{ weather_info.datetime }}
+                            </p>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 {% block content %}
 <h1>Добрый день!</h1>
 <h2>Вот ваш список задач на сегодня:</h2>

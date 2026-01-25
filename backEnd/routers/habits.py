@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Request, Depends
 import os
 from os.path import dirname, abspath
-from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -11,9 +10,9 @@ from db.models import Habit
 router=APIRouter(prefix='/habits', tags=['Привычки'])
 
 base_dir=os.path.dirname(os.path.abspath(__file__))
-html_path=os.path.join(base_dir,'..','..','frontEnd','public','main_pages', 'habits.html')
+html_path=os.path.join(base_dir,'..','..','frontEnd','public','main_pages')
 if os.path.exists(html_path):
-    router.mount('/main', StaticFiles(directory=os.path.dirname(html_path), html=True))
+    router.mount('/main', StaticFiles(directory=os.path.dirname(html_path)))
 else:
     print(f'файл не найден:{html_path}')
 

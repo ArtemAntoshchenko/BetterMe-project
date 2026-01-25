@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from db.database import *
 
-router=APIRouter(prefix='tracking', tags=['Отслеживание привычек'])
+router=APIRouter(prefix='/tracking', tags=['Отслеживание привычек'])
 
 base_dir=os.path.dirname(os.path.abspath(__file__))
 html_path=os.path.join(base_dir,'..','..','frontEnd','public','main_pages')

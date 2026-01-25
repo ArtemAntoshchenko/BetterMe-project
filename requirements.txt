@@ -1,6 +1,7 @@
 fastapi[all]
 jinja2
-requests
+aiohttp
+tzdata
 sqlalchemy
 alembic
 asyncpg

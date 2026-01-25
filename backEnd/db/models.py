@@ -13,6 +13,7 @@ class User(Base):
     first_name: Mapped[str]
     last_name: Mapped[str]
     date_of_birth: Mapped[date]
+    city: Mapped[str]
     premium: Mapped[bool]
     auth: Mapped['Auth']=relationship('Auth', back_populates='user', uselist=False, cascade='all, delete-orphan')
 
