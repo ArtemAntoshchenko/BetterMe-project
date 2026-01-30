@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
 from contextlib import asynccontextmanager
 from sqlalchemy import func
-from core.config import get_db_url
+from ..core.config import get_db_url
 from datetime import datetime
 from typing import Annotated
 

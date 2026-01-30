@@ -1,6 +1,6 @@
 from aiohttp import ClientSession
-from db.models import User
-from core.config import settings
+from ..db.models import User
+from ..core.config import settings
 
 
 class WeatherClient():

@@ -1,15 +1,16 @@
 from fastapi import APIRouter, Request, Depends
 import os
-from core.weather_api import WeatherClient
+from ..core.weather_api import WeatherClient
+from ..routers.auth import getMe
 from os.path import dirname, abspath
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from db.database import *
+from ..db.database import *
 from zoneinfo import ZoneInfo
 from datetime import timedelta
-from DAO.dao_habits import HabitDAO
-from schemas.model_schemas.habit_schema import HabitSchema
+from ..DAO.dao_habits import HabitDAO
+from ..schemas.model_schemas.habit_schema import HabitSchema
 
 router=APIRouter(prefix='/dashboard', tags=['Дашборд'])
 
@@ -20,7 +21,7 @@ js_path=os.path.join(base_dir,'..','..','frontEnd','static','js')
 templates=Jinja2Templates(directory=html_path)
 
 @router.get('/main')
-async def dashBoard(request: Request):
+async def dashBoard(request: Request, profile=Depends(getMe)):
     weather_client=WeatherClient(base_url='https://api.openweathermap.org')
     weather_info=await weather_client.get_info()
     user_timezone=str(request.cookies.get('timezone', 'UTC'))
@@ -43,7 +44,8 @@ async def dashBoard(request: Request):
     context={
         "request": request,
         "js_url": js_path,
-        "weather_info": city_weather
+        "weather_info": city_weather,
+        "profile": profile
     }
     return templates.TemplateResponse('dashboard.html', context)
 

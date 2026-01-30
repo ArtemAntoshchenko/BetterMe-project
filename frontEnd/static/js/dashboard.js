@@ -11,5 +11,23 @@ async function complete_task(task_id) {
     const respons=await fetch('')
 }
 
+async function logoutFunction() {
+    try {
+        let response=await fetch('/auth/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (response.ok) {
+            window.location.href='/auth/login';
+        } else {
+            const errorData=await response.json();
+            console.error('Ошибка при выходе:', errorData.message || response.statusText);
+        }
+    } catch (error) {
+        console.error('Ошибка сети', error);
+    }
+}
 
 get_daily_list_habits()

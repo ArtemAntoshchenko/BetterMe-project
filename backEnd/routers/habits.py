@@ -3,11 +3,11 @@ import os
 from os.path import dirname, abspath
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from db.database import *
-from db.models import Habit
-from schemas.service_schemas.update_habit_schema import HabitUpdateSchema, HabitResponseSchema
-from schemas.model_schemas.habit_schema import HabitSchema
-from DAO.dao_habits import HabitDAO
+from ..db.database import *
+from ..db.models import Habit
+from ..schemas.service_schemas.update_habit_schema import HabitUpdateSchema, HabitResponseSchema
+from ..schemas.model_schemas.habit_schema import HabitSchema
+from ..DAO.dao_habits import HabitDAO
 
 router=APIRouter(prefix='/habits', tags=['Привычки'])
 

@@ -27,7 +27,7 @@ class Auth(Base):
     user: Mapped[User]=relationship('User', back_populates='auth', uselist=False)
 
 class Habit(Base):
-    __tablename__ = 'Habits'
+    __tablename__ = 'habits'
 
     id: Mapped[int_pk]
     name: Mapped[str_uniq]

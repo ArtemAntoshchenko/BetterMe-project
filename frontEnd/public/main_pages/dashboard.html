@@ -2,31 +2,39 @@
 {% block title %}
     <title>Dashboard</title>
 {% endblock %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.css"/>
+
+{% block sidebar_left %}
+<div class="container">
+    <h1>Мой профиль:</h1>
+    <div class="user-profile">
+        <div class="user-info">
+            <h2>ID: {{ profile.id }}</h2>
+            <p><strong>Полное имя:</strong> {{ profile.first_name }} {{ profile.last_name }}</p>
+            <p><strong>Email:</strong> {{ profile.email }}</p>
+        </div>
+    </div>
+    <button type="submit" id="logout-button" class="submit-button" onclick="logoutFunction()">Выйти</button>
+</div>
+<nav class="sidebar_left">
+    <h1>Навигация по сайту:</h1>
+    <a href="/dashboard/main">Главная</a><br>
+    <a href="/habits/main">Список привычек</a><br>
+    <a href="/tracking/main">Отслеживание привычек</a><br>
+</nav>
+{% endblock %}
+
 {% block sidebar_right %}
 <div class="container">
-    <div class="columns">
-        <div class="column is-offset-4 is-4">
-            <div class="box">
-                <article class="media">
-                    <div class="media-right">
-                        <figure class="image is-50x50">
-                            <img src="http://openweathermap.org/img/w/{{ weather_info.icon }}.png" alt="Image">
-                        </figure>
-                    </div>
-                    <div class="media-right">
-                        <div class="content">
-                            <p>
-                                <br>
-                                <span class="subtitle">{{ weather_info.temperature }}°C</span>
-                                <br> {{ weather_info.description }}
-                                <br> {{ weather_info.datetime }}
-                            </p>
-                        </div>
-                    </div>
-                </article>
-            </div>
-        </div>
+    <figure class="image is-50x50">
+        <img src="http://openweathermap.org/img/w/{{ weather_info.icon }}.png" alt="Image">
+    </figure>
+    <div class="content">
+        <p>
+            <br>
+            <span class="subtitle">{{ weather_info.temperature }}°C</span>
+            <br> {{ weather_info.description }}
+            <br> {{ weather_info.datetime }}
+        </p>
     </div>
 </div>
 {% endblock %}

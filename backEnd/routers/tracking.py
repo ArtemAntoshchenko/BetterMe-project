@@ -4,7 +4,7 @@ from os.path import dirname, abspath
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from db.database import *
+from ..db.database import *
 
 router=APIRouter(prefix='/tracking', tags=['Отслеживание привычек'])
 

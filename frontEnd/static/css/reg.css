@@ -1,0 +1,260 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    padding: 40px;
+    transition: transform 0.3s ease;
+}
+
+.container:hover {
+    transform: translateY(-5px);
+}
+
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+h1:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(to right, #3498db, #2ecc71);
+    border-radius: 2px;
+}
+
+/* Стили формы */
+.registration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.registration-form label {
+    display: block;
+    color: #34495e;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 15px;
+    transition: color 0.3s;
+}
+
+.registration-form label:hover {
+    color: #3498db;
+}
+
+.registration-form input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e0e6ed;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    color: #2c3e50;
+}
+
+.registration-form input:focus {
+    outline: none;
+    border-color: #3498db;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.registration-form input:hover {
+    border-color: #b8c4d4;
+}
+
+/* Специальные стили для разных типов input */
+.registration-form input[type="password"] {
+    letter-spacing: 1px;
+}
+
+.registration-form input[type="date"] {
+    cursor: pointer;
+}
+
+.registration-form input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    background: #f8f9fa;
+    transition: background 0.3s;
+}
+
+.registration-form input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    background: #e0e6ed;
+}
+
+.registration-form input[type="tel"] {
+    background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%233498db" viewBox="0 0 16 16"><path d="M11 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h6zM5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H5z"/><path d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>') no-repeat right 16px center;
+    background-size: 20px;
+    padding-right: 50px;
+}
+
+/* Стили кнопки */
+.submit-button {
+    background: linear-gradient(to right, #3498db, #2ecc71);
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 10px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    width: 100%;
+    letter-spacing: 0.5px;
+}
+
+.submit-button:hover {
+    background: linear-gradient(to right, #2980b9, #27ae60);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+}
+
+.submit-button:active {
+    transform: translateY(0);
+}
+
+.submit-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+}
+
+/* Адаптивность */
+@media (max-width: 600px) {
+    .container {
+        padding: 30px 25px;
+        margin: 10px;
+        border-radius: 12px;
+    }
+    
+    h1 {
+        font-size: 24px;
+        margin-bottom: 25px;
+    }
+    
+    .registration-form input {
+        padding: 12px 14px;
+        font-size: 15px;
+    }
+    
+    .submit-button {
+        padding: 14px 28px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 400px) {
+    body {
+        padding: 10px;
+    }
+    
+    .container {
+        padding: 25px 20px;
+    }
+    
+    h1 {
+        font-size: 22px;
+    }
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.container {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Стили для состояния загрузки */
+.submit-button.loading {
+    position: relative;
+    color: transparent;
+}
+
+.submit-button.loading:after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Стили для валидации */
+.registration-form input:invalid:not(:focus):not(:placeholder-shown) {
+    border-color: #e74c3c;
+    background: #fff5f5;
+}
+
+.registration-form input:valid:not(:focus):not(:placeholder-shown) {
+    border-color: #2ecc71;
+    background: #f5fff7;
+}
+
+/* Стили для placeholder */
+.registration-form input::placeholder {
+    color: #a0aec0;
+    opacity: 0.7;
+}
+
+.registration-form input:focus::placeholder {
+    opacity: 0.4;
+}
+
+/* Стили для обязательных полей */
+.registration-form input:required + label:after {
+    content: ' *';
+    color: #e74c3c;
+}

@@ -6,6 +6,7 @@ from datetime import date, datetime
 class UserRegisterSchema(BaseModel):
     model_config=ConfigDict(from_attributes=True)
     email: EmailStr=Field(..., description="Электронная почта")
+    login: str=Field(..., min_length=4, max_length=15, description="Логин, от 4 до 15 знаков")
     password: str=Field(..., min_length=6, max_length=30, description="Пароль, от 6 до 30 знаков")
     phone_number: str=Field(..., description="Номер телефона в международном формате, начинающийся с '+'")
     first_name: str=Field(..., min_length=2, max_length=20, description="Имя, от 2 до 20 символов")
@@ -30,3 +31,8 @@ class UserRegisterSchema(BaseModel):
         if value and value>=datetime.now().date():
             raise ValueError('Дата рождения должна быть в прошлом')
         return value
+
+class UserAuthSchema(BaseModel):
+    model_config=ConfigDict(from_attributes=True)
+    login: str=Field(...,  min_length=4, max_length=15, description="Логин для входа")
+    password: str=Field(..., min_length=6, max_length=30, description="Пароль, от 6 до 30 знаков")

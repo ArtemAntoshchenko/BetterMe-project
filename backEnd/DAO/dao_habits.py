@@ -1,6 +1,6 @@
 from .dao_base import BaseDAO
-from db.models import Habit
-from db.database import get_db
+from ..db.models import Habit
+from ..db.database import get_db
 from sqlalchemy import select
  
 class HabitDAO(BaseDAO[Habit]):
