@@ -24,7 +24,7 @@ class BaseDAO():
     @classmethod 
     async def add(cls, **values):
         async with get_db() as session:
-            new_instance = cls.model(**values)
+            new_instance=cls.model(**values)
             session.add(new_instance)
             await session.flush()
             return new_instance
@@ -35,17 +35,23 @@ class BaseDAO():
             query=(
                 update(cls.model)
                 .where(*[
-                    getattr(cls.model, key) == value 
+                    getattr(cls.model, key)==value 
                     for key, value in filter_by.items()
                 ])
                 .values(**values)
                 .execution_options(synchronize_session="fetch")
             )
-            result=await session.execute(query)
-            return result
+            await session.execute(query)
+            select_query=select(cls.model).where(*[
+                getattr(cls.model, key)==value 
+                for key, value in filter_by.items()
+            ])
+            result=await session.execute(select_query)
+            updated_record=result.scalar_one_or_none()
+            return updated_record
     
     @classmethod
-    async def delete(cls, delete_all: bool = False, **filter_by):
+    async def delete(cls, delete_all: bool=False, **filter_by):
         if not delete_all and not filter_by:
             raise ValueError("Необходимо указать хотя бы один параметр для удаления!")
         async with get_db() as session:

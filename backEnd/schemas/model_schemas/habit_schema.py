@@ -6,8 +6,8 @@ class HabitSchema(BaseModel):
     id: int
     name: str=Field(..., description="Имя привычки")
     description: str=Field(..., max_length=300, description="Описание привычки")
-    complit: bool=Field(..., description="Состояние привычки")
+    complit: Optional[bool]=Field(None, description="Состояние привычки")
     complit_today: Optional[bool]=Field(None, description="Состояние привычки на сегодня")
-    goal: Optional[int]=Field(None, description="Цель для привычки")
+    goal: int=Field(..., description="Цель для привычки")
     progress: Optional[int]=Field(None, description="Прогресс привычки")
-    step: Optional[int]=Field(None, description="Шаг выполнения привычки")
+    step: int=Field(..., description="Шаг выполнения привычки")

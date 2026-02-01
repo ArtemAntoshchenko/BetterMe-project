@@ -29,11 +29,13 @@ async def habits(request: Request, profile=Depends(getUserInfo)):
 
 @router.get('/main/getHabits')
 async def getHabits()-> list[HabitSchema]:
-    return HabitDAO.find_all()
+    habits=await HabitDAO.find_all()
+    return habits
 
 @router.get('/main/getActiveHabits')
 async def getActiveHabits()-> list[HabitSchema]:
-    return HabitDAO.find_all_active()
+    habits_active=await HabitDAO.find_all_active()
+    return habits_active
 
 @router.get('/main/createNewHabit')
 async def createNewHabit(request: Request):
@@ -55,7 +57,7 @@ async def createNewHabit(habit_data: HabitCreateSchema)-> dict:
 async def updateHabit(habit: HabitUpdateSchema)-> HabitUpdateResponse:
     update_data = habit.model_dump(exclude_none=True)
     habit_id = update_data.pop('id')
-    result=await HabitDAO.update(filter_by={'habit_id': habit_id}, **update_data)                              
+    result=await HabitDAO.update(filter_by={'id': habit_id}, **update_data)                              
     return result
 
 @router.delete("/main/delete/{habit_id}")

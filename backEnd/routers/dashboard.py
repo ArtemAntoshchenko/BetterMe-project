@@ -22,7 +22,7 @@ templates=Jinja2Templates(directory=html_path)
 @router.get('/main')
 async def dashBoard(request: Request, profile=Depends(getUserInfo)):
     weather_client=WeatherClient(base_url='https://api.openweathermap.org')
-    weather_info=await weather_client.get_info()
+    weather_info=await weather_client.get_info(profile_data=profile)
     user_timezone=str(request.cookies.get('timezone', 'UTC'))
     timezone=ZoneInfo(user_timezone)
     tomorrow=datetime.now(timezone)+timedelta(days=1)
@@ -50,12 +50,12 @@ async def dashBoard(request: Request, profile=Depends(getUserInfo)):
     return templates.TemplateResponse('dashboard.html', context)
 
 @router.get('/main/getActiveHabits')
-async def getActiveHabits()-> list[HabitSchema]:
-    result=HabitDAO.find_all_active()
+async def getActiveHabits():
+    result=await HabitDAO.find_all_active()
     return [{
         'name': habit.name,
         'description': habit.description,
-        'complit_today:': habit.complit_today,
-        'progress:': habit.progress,
-        'goal:': habit.goal
+        'complit_today': habit.complit_today,
+        'progress': habit.progress,
+        'goal': habit.goal
     } for habit in result]
