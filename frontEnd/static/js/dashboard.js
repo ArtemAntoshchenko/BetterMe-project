@@ -28,10 +28,15 @@ function createHabitItem(habit) {
     checkbox.dataset.habitId=habit.id;
     
     // Добавляем обработчик для обновления статуса
-    checkbox.addEventListener('change', function() {
-        updateHabitStatus(habit.id, this.checked);
+    checkbox.addEventListener('change', async function() {
+    if (this.checked) {
+        const success=await complitHabit(this.dataset.habitId);
+        if (!success) {
+            this.checked=false;
+        }
+    }
     });
-    
+
     // Создаем контейнер для информации о привычке
     const habitInfo = document.createElement('div');
     habitInfo.className = 'habit-info';
@@ -75,6 +80,29 @@ function createHabitItem(habit) {
     li.appendChild(habitInfo);
     
     return li;
+}
+
+async function complitHabit(habit_id) {
+    try {
+        const response=await fetch(`/dashboard/main/complitActiveHabit/${habit_id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            const error=await response.json();
+            alert(error.detail || 'Ошибка при отметке привычки');
+            return false;
+        }
+        const result=await response.json();
+        alert(result.message);
+        return true;
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Ошибка при отметке привычки');
+        return false;
+    }
 }
 
 async function logoutFunction() {

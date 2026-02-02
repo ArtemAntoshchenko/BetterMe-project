@@ -53,9 +53,15 @@ async def dashBoard(request: Request, profile=Depends(getUserInfo)):
 async def getActiveHabits():
     result=await HabitDAO.find_all_active()
     return [{
+        'id': habit.id,
         'name': habit.name,
         'description': habit.description,
         'complit_today': habit.complit_today,
         'progress': habit.progress,
         'goal': habit.goal
     } for habit in result]
+
+@router.post('/main/complitActiveHabit/{habit_id}')
+async def complitActiveHabit(habit_id: int):
+    await HabitDAO.complit_habit(habit_id)
+    return {'message': 'Привычка на сегодня выполнена'}

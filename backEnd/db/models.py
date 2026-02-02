@@ -1,5 +1,5 @@
-from sqlalchemy import ForeignKey, Text
-from sqlalchemy.orm import Mapped, relationship, mapped_column
+from sqlalchemy import Text
+from sqlalchemy.orm import Mapped, mapped_column
 from .database import Base, int_pk, str_uniq, int_null_true, bool_False
 from datetime import date
 
@@ -27,7 +27,7 @@ class Habit(Base):
     complit: Mapped[bool_False]
     complit_today: Mapped[bool_False]
     goal: Mapped[int_null_true]
-    progress: Mapped[int_null_true]
+    progress: Mapped[int]=mapped_column(default=0)
     step: Mapped[int_null_true]
 
 
