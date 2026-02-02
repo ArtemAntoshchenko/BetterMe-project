@@ -1,4 +1,4 @@
-async function get_habits() {
+async function getHabits() {
     try {
         const response=await fetch('/habits/main/getHabits', {
             method: 'GET',
@@ -139,7 +139,7 @@ function row(habit) {
     return tr;
 }
 
-async function get_active_habits() {
+async function getActiveHabits() {
     try {
         const response=await fetch('/habits/main/getActiveHabits', {
             method: 'GET',
@@ -183,7 +183,11 @@ function activeHabitRow(habit) {
     const statusTd=document.createElement('td');
     const statusCheckbox=document.createElement('input');
     statusCheckbox.type='checkbox';
-    statusCheckbox.checked=habit.today_completed || false;
+    statusCheckbox.checked=habit.complit_today || false;
+    statusCheckbox.addEventListener('change', async function() { 
+        alert('Изменить состояние задачи здесь нельзя!')
+        window.location.reload()
+    })
     statusTd.append(statusCheckbox);
     tr.append(statusTd);
 
@@ -210,5 +214,5 @@ async function logoutFunction() {
 }
 
 
-get_habits();
-get_active_habits();
+getHabits();
+getActiveHabits();

@@ -8,19 +8,29 @@
 {% endblock %}
 
 {% block content %}
-    <h2>Все привычки:</h2>
-    <table>
-        <thead><tr><th>Название</th><th>Описание</th><th>Цель</th><th>Прогресс</th></tr></thead>
-        <tbody align="center" id="tbodyHabits">
-        </tbody>
-    </table>
-    <h2>Активные привычки:</h2>
-    <table>
-        <thead><tr><th>Название</th><th>Описание</th><th>Цель</th><th>Прогресс</th><th>Состояние на сегодня</th></tr></thead>
-        <tbody align="center" id="tbodyActiveHabits">
-        </tbody>
-    </table>
-    <button type="button" id="create-button" class="create-button" onclick="createHabit()">Создать новую привычку</button>
+     <div class="habits-container">
+        <div class="habit-section">
+            <h2>Все привычки:</h2>
+            <table>
+                <thead><tr><th>Название</th><th>Описание</th><th>Цель</th><th>Прогресс</th></tr></thead>
+                <tbody align="center" id="tbodyHabits">
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="habit-section">
+            <h2>Активные привычки:</h2>
+            <table>
+                <thead><tr><th>Название</th><th>Описание</th><th>Цель</th><th>Прогресс</th><th>Состояние на сегодня</th></tr></thead>
+                <tbody align="center" id="tbodyActiveHabits">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="button-container">
+        <button type="button" id="create-button" class="create-button" onclick="createHabit()">Создать новую привычку</button>
+    </div>
 {% endblock %}
 
 {% block sidebar_right %}

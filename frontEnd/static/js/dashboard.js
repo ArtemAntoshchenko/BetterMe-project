@@ -1,4 +1,4 @@
-async function get_daily_list_habits() {
+async function getDailyListHabits() {
     try {
         const response=await fetch('/dashboard/main/getActiveHabits');
         if (!response.ok) {
@@ -27,7 +27,6 @@ function createHabitItem(habit) {
     checkbox.checked=habit.complit_today || false;
     checkbox.dataset.habitId=habit.id;
     
-    // Добавляем обработчик для обновления статуса
     checkbox.addEventListener('change', async function() {
     if (this.checked) {
         const success=await complitHabit(this.dataset.habitId);
@@ -35,43 +34,40 @@ function createHabitItem(habit) {
             this.checked=false;
         }
     }
+    else {
+        alert('Сегодня эта задача уже выполнена!')
+        window.location.reload()
+    }
     });
 
-    // Создаем контейнер для информации о привычке
-    const habitInfo = document.createElement('div');
-    habitInfo.className = 'habit-info';
+    const habitInfo=document.createElement('div');
+    habitInfo.className='habit-info';
     
-    // Название привычки
-    const nameElement = document.createElement('h3');
-    nameElement.className = 'habit-name';
-    nameElement.textContent = habit.name;
+    const nameElement=document.createElement('h3');
+    nameElement.className='habit-name';
+    nameElement.textContent=habit.name;
     
-    // Описание привычки
-    const descriptionElement = document.createElement('p');
-    descriptionElement.className = 'habit-description';
-    descriptionElement.textContent = habit.description || 'Без описания';
+    const descriptionElement=document.createElement('p');
+    descriptionElement.className='habit-description';
+    descriptionElement.textContent=habit.description;
     
-    // Прогресс
-    const progressElement = document.createElement('div');
-    progressElement.className = 'habit-progress';
+    const progressElement=document.createElement('div');
+    progressElement.className='habit-progress';
+    const progressText=document.createElement('span');
+    progressText.textContent=`Прогресс: ${habit.progress || 0}/${habit.goal} дней`;
     
-    const progressText = document.createElement('span');
-    progressText.textContent = `Прогресс: ${habit.progress || 0}/${habit.goal} дней`;
+    const progressBar=document.createElement('div');
+    progressBar.className='progress-bar';
+    const progressPercentage=habit.goal>0 ? Math.min(100, ((habit.progress || 0)/habit.goal)*100):0;
     
-    // Прогресс-бар (опционально)
-    const progressBar = document.createElement('div');
-    progressBar.className = 'progress-bar';
-    const progressPercentage = habit.goal > 0 ? Math.min(100, ((habit.progress || 0) / habit.goal) * 100) : 0;
-    
-    const progressFill = document.createElement('div');
-    progressFill.className = 'progress-fill';
-    progressFill.style.width = `${progressPercentage}%`;
+    const progressFill=document.createElement('div');
+    progressFill.className='progress-fill';
+    progressFill.style.width=`${progressPercentage}%`;
     progressBar.appendChild(progressFill);
     
     progressElement.appendChild(progressText);
     progressElement.appendChild(progressBar);
     
-    // Собираем все вместе
     habitInfo.appendChild(nameElement);
     habitInfo.appendChild(descriptionElement);
     habitInfo.appendChild(progressElement);
@@ -97,6 +93,7 @@ async function complitHabit(habit_id) {
         }
         const result=await response.json();
         alert(result.message);
+        window.location.reload()
         return true;
     } catch (error) {
         console.error('Ошибка:', error);
@@ -124,4 +121,4 @@ async function logoutFunction() {
     }
 }
 
-get_daily_list_habits()
+getDailyListHabits()

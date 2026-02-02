@@ -1,3 +1,4 @@
+/* ===== ОСНОВНЫЕ СТИЛИ ===== */
 * {
     margin: 0;
     padding: 0;
@@ -57,37 +58,194 @@ body::before {
     pointer-events: none;
 }
 
-/* ===== КОНТЕЙНЕР СТРАНИЦЫ ПРИВЫЧЕК ===== */
+/* ===== ОСНОВНОЙ КОНТЕЙНЕР С ЛЕЙАУТОМ ===== */
 .layout {
+    display: flex;
+    min-height: 100vh;
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+    max-width: 1600px;
+    margin: 0 auto;
+    background: transparent;
+    backdrop-filter: none;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    align-items: flex-start; /* Выравнивание по верху */
+}
+
+/* ===== ЛЕВАЯ БОКОВАЯ ПАНЕЛЬ ===== */
+.sidebar-left {
+    width: 320px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    position: sticky;
+    top: var(--spacing-md);
+    height: fit-content;
+}
+
+/* Навигация */
+.navigation {
     background: var(--card-bg);
     backdrop-filter: var(--blur);
     border-radius: var(--radius-lg);
     padding: var(--spacing-lg);
-    margin: var(--spacing-md);
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow);
-    min-height: calc(100vh - 40px);
-    max-width: 1400px;
-    margin-left: auto;
-    margin-right: auto;
+    transition: var(--transition);
 }
 
-/* Заголовки страницы */
-.layout h2 {
+.navigation h1 {
     font-size: 1.8rem;
     color: var(--primary-color);
-    margin: var(--spacing-xl) 0 var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    font-weight: 600;
+    border-bottom: 2px solid rgba(100, 255, 218, 0.2);
+    padding-bottom: var(--spacing-sm);
+}
+
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.nav-links a {
+    color: var(--text-accent);
+    text-decoration: none;
+    padding: 12px 15px;
+    border-radius: var(--radius-md);
+    font-size: 1.1rem;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid transparent;
+    transition: var(--transition);
+}
+
+/* Профиль пользователя */
+.user-profile {
+    background: var(--card-bg);
+    backdrop-filter: var(--blur);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    transition: var(--transition);
+}
+
+.user-profile h1 {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-md);
+    font-weight: 700;
+}
+
+.user-info {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: var(--spacing-md);
+    flex-grow: 1;
+}
+
+.user-info h2 {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.user-info p {
+    font-size: 1rem;
+    margin: 10px 0;
+    padding: 10px 15px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--primary-color);
+    transition: var(--transition);
+}
+
+.user-info strong {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+/* Кнопка выхода */
+.logout-button {
+    background: linear-gradient(to right, 
+        rgba(52, 152, 219, 0.8), 
+        rgba(46, 204, 113, 0.8), 
+        rgba(255, 255, 107, 0.8));
+    color: #0a192f;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: var(--transition);
+    width: 100%;
+    margin-top: auto;
+    box-shadow: 0 4px 15px rgba(255, 255, 107, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.logout-button:active {
+    transform: translateY(0);
+}
+
+/* ===== ПРАВЫЙ КОНТЕНТ - КОНТЕЙНЕР С ТАБЛИЦАМИ И КНОПКОЙ ===== */
+.layout > :not(.sidebar-left) {
+    flex: 1;
+    background: var(--card-bg);
+    backdrop-filter: var(--blur);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    min-height: auto;
+    height: auto;
+    display: flex;
+    flex-direction: column; /* Вертикальное расположение элементов */
+}
+
+/* ===== КОНТЕЙНЕР ДЛЯ ВСЕХ ТАБЛИЦ ===== */
+.habits-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl); /* Расстояние между секциями */
+    flex: 1; /* Занимает всё доступное пространство */
+}
+
+/* ===== СЕКЦИЯ С ТАБЛИЦЕЙ ===== */
+.habit-section {
+    margin-bottom: 0; /* Убираем внешние отступы */
+}
+
+.habit-section:last-of-type {
+    margin-bottom: 0;
+}
+
+/* ===== ЗАГОЛОВКИ ВНУТРИ СЕКЦИЙ ===== */
+.habit-section h2 {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin: 0 0 var(--spacing-md) 0;
     font-weight: 600;
     border-bottom: 2px solid rgba(100, 255, 218, 0.2);
     padding-bottom: var(--spacing-sm);
     position: relative;
 }
 
-.layout h2:first-of-type {
-    margin-top: 0;
-}
-
-.layout h2::after {
+.habit-section h2::after {
     content: '';
     position: absolute;
     bottom: -2px;
@@ -98,11 +256,10 @@ body::before {
 }
 
 /* ===== ТАБЛИЦЫ ПРИВЫЧЕК ===== */
-table {
+.habit-section table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    margin-bottom: var(--spacing-xl);
     background: rgba(255, 255, 255, 0.03);
     border-radius: var(--radius-md);
     overflow: hidden;
@@ -141,10 +298,6 @@ tbody tr {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-tbody tr:hover {
-    background: rgba(100, 255, 218, 0.05);
-    transform: translateX(4px);
-}
 
 tbody td {
     padding: var(--spacing-md);
@@ -167,58 +320,64 @@ tbody td:nth-child(5) { /* Статус */
     text-align: center;
 }
 
-/* ===== ПРОГРЕСС БАР В ВАШЕМ СТИЛЕ ===== */
-.progress-container {
-    display: flex;
+/* ===== КОНТЕЙНЕР ДЛЯ КНОПКИ ===== */
+.button-container {
+    text-align: center;
+    padding-top: var(--spacing-xl);
+    margin-top: var(--spacing-xl);
+    border-top: 1px solid rgba(100, 255, 218, 0.1);
+}
+
+/* ===== КНОПКА СОЗДАНИЯ ПРИВЫЧКИ ===== */
+#create-button.create-button {
+    display: inline-block;
+    margin: 0;
+    padding: 15px 40px;
+    background: linear-gradient(to right, 
+        rgba(52, 152, 219, 0.8), 
+        rgba(46, 204, 113, 0.8), 
+        rgba(255, 255, 107, 0.8));
+    color: #0a192f;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    background: rgba(0, 0, 0, 0.3);
-    padding: 8px 12px;
-    border-radius: var(--radius-sm);
-    border: 1px solid rgba(100, 255, 218, 0.1);
-}
-
-.progress-bar-wrapper {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    height: 8px;
+    gap: 10px;
+    max-width: 300px;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(255, 255, 107, 0.3);
+    position: relative;
     overflow: hidden;
-    position: relative;
 }
 
-.progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, 
-        var(--primary-color) 0%, 
-        var(--success-color) 100%);
-    border-radius: 10px;
-    transition: width 0.5s ease;
-    position: relative;
-    box-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
+#create-button.create-button:active {
+    transform: translateY(0);
 }
 
-.progress-bar::after {
+#create-button.create-button::before {
+    content: "+";
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+#create-button.create-button::after {
     content: '';
     position: absolute;
     top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
     background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(255, 255, 255, 0.3) 50%, 
-        transparent 100%);
-    
+        transparent, 
+        rgba(255, 255, 255, 0.3), 
+        transparent);
+    transition: transform 0.5s ease;
 }
 
-.progress-text {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--primary-color);
-    min-width: 40px;
-    font-family: 'Courier New', monospace;
-}
 
 /* ===== СТАТУС ПРИВЫЧЕК ===== */
 .status-completed {
@@ -267,32 +426,6 @@ tbody td:nth-child(5) { /* Статус */
     filter: drop-shadow(0 0 2px rgba(255, 209, 102, 0.5));
 }
 
-/* ===== КНОПКА СОЗДАНИЯ ПРИВЫЧКИ ===== */
-.create-button {
-    display: block;
-    margin: var(--spacing-xl) auto 0;
-    padding: 15px 40px;
-    background: linear-gradient(to right, 
-        rgba(52, 152, 219, 0.8), 
-        rgba(46, 204, 113, 0.8), 
-        rgba(255, 255, 107, 0.8));
-    color: #0a192f;
-    border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    max-width: 300px;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(255, 255, 107, 0.3);
-    position: relative;
-    overflow: hidden;
-}
-
 /* ===== ПУСТЫЕ СОСТОЯНИЯ ТАБЛИЦ ===== */
 #tbodyHabits:empty::after,
 #tbodyActiveHabits:empty::after {
@@ -309,7 +442,6 @@ tbody td:nth-child(5) { /* Статус */
     font-size: 1.1rem;
     border: 2px dashed rgba(100, 255, 218, 0.3);
 }
-
 
 /* ===== ДОПОЛНИТЕЛЬНЫЕ ЭЛЕМЕНТЫ ===== */
 .habit-name {
@@ -330,118 +462,8 @@ tbody td:nth-child(5) { /* Статус */
     font-family: 'Courier New', monospace;
 }
 
-/* Разделитель между таблицами */
-.layout h2 + table {
-    margin-top: 0;
-}
-
-.sidebar-left {
-    width: 320px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.logout-button {
-    background: linear-gradient(to right, #3498db, #2ecc71, yellow);
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    width: 100%;
-    margin-top: auto;
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-}
-
-.user-profile {
-    background: rgba(17, 34, 64, 0.7);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 25px;
-    border: 1px solid rgba(100, 255, 218, 0.1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.user-profile h1 {
-    font-size: 1.8rem;
-    color: #64ffda;
-    margin-bottom: 20px;
-    font-weight: 700;
-}
-
-.user-info {
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
-    padding: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    margin-bottom: 20px;
-    flex-grow: 1;
-}
-
-.user-info h2 {
-    font-size: 1.2rem;
-    color: #8892b0;
-    margin-bottom: 15px;
-    font-weight: 500;
-}
-
-.user-info p {
-    font-size: 1rem;
-    margin: 10px 0;
-    padding: 10px 15px;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 8px;
-    border-left: 3px solid #64ffda;
-}
-
-.user-info strong {
-    color: #64ffda;
-    font-weight: 600;
-    margin-right: 8px;
-}
-
-.navigation {
-    background: rgba(17, 34, 64, 0.7);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 25px;
-    border: 1px solid rgba(100, 255, 218, 0.1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-.navigation h1 {
-    font-size: 1.8rem;
-    color: #64ffda;
-    margin-bottom: 20px;
-    font-weight: 600;
-    border-bottom: 2px solid rgba(100, 255, 218, 0.2);
-    padding-bottom: 10px;
-}
-
-.nav-links {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.nav-links a {
-    color: #ccd6f6;
-    text-decoration: none;
-    padding: 12px 15px;
-    border-radius: 10px;
-    font-size: 1.1rem;
-    font-weight: 500;
-    background: rgba(255, 255, 255, 0.05);
-    border-left: 3px solid transparent;
-    transition: all 0.2s;
+.habits-container > .habit-section + .habit-section {
+    margin-top: var(--spacing-xl);
 }
 
 /* ===== КНОПКИ ДЕЙСТВИЙ В ТАБЛИЦЕ ===== */
@@ -469,14 +491,6 @@ tbody td:nth-child(5) { /* Статус */
     box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
 }
 
-.edit-btn:hover {
-    background: linear-gradient(135deg, 
-        rgba(52, 152, 219, 1) 0%, 
-        rgba(41, 128, 185, 1) 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
-}
-
 .edit-btn::before {
     content: "✎";
     font-size: 1rem;
@@ -488,14 +502,6 @@ tbody td:nth-child(5) { /* Статус */
         rgba(192, 57, 43, 0.9) 100%);
     color: white;
     box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
-}
-
-.delete-btn:hover {
-    background: linear-gradient(135deg, 
-        rgba(231, 76, 60, 1) 0%, 
-        rgba(192, 57, 43, 1) 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
 }
 
 .delete-btn::before {
@@ -541,39 +547,8 @@ input[type="checkbox"]:checked::after {
     font-size: 0.9rem;
 }
 
-input[type="checkbox"]:hover {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
-}
 
-
-/* ===== СТИЛИ ДЛЯ ПРОГРЕССА В ЯЧЕЙКАХ ===== */
-.progress-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: var(--radius-sm);
-    border: 1px solid rgba(100, 255, 218, 0.2);
-}
-
-.progress-value {
-    font-family: 'Courier New', monospace;
-    font-weight: bold;
-    color: var(--primary-color);
-    font-size: 0.95rem;
-}
-
-.progress-slash {
-    color: var(--text-secondary);
-}
-
-.progress-goal {
-    color: var(--warning-color);
-}
-
-/* ===== СТИЛИ ДЛЯ ФОРМ РЕДАКТИРОВАНИЯ (ПРОМПТЫ) ===== */
+/* ===== СТИЛИ ДЛЯ ФОРМ РЕДАКТИРОВАНИЯ ===== */
 .prompt-overlay {
     position: fixed;
     top: 0;
@@ -612,7 +587,6 @@ input[type="checkbox"]:hover {
     z-index: 1001;
 }
 
-
 .notification.success {
     border-left: 4px solid var(--success-color);
 }
@@ -620,39 +594,6 @@ input[type="checkbox"]:hover {
 .notification.error {
     border-left: 4px solid var(--danger-color);
 }
-
-
-/* ===== СТИЛИ ДЛЯ ПОДСКАЗОК ===== */
-.tooltip {
-    position: relative;
-    display: inline-block;
-}
-
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: 200px;
-    background-color: var(--card-bg);
-    color: var(--text-primary);
-    text-align: center;
-    border-radius: var(--radius-sm);
-    padding: 8px 12px;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -100px;
-    opacity: 0;
-    transition: opacity 0.3s;
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow);
-    font-size: 0.85rem;
-}
-
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-}
-
 
 /* ===== СТИЛИ ДЛЯ ПРОГРЕССА В ТЕКСТЕ ===== */
 .progress-percentage {
@@ -689,22 +630,4 @@ input[type="checkbox"]:hover {
     background: rgba(255, 209, 102, 0.2);
     color: var(--warning-color);
     border: 1px solid rgba(255, 209, 102, 0.3);
-}
-
-/* ===== ЭФФЕКТЫ ПРИ ЗАГРУЗКЕ ===== */
-.loading {
-    opacity: 0.6;
-    pointer-events: none;
-    position: relative;
-}
-
-.loading::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(10, 25, 47, 0.5);
-    border-radius: inherit;
 }

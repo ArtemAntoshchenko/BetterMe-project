@@ -30,7 +30,7 @@ function displayErrors(errorData) {
     let message='Произошла ошибка';
     if (errorData && errorData.detail) {
         if (Array.isArray(errorData.detail)) {
-            message = errorData.detail.map(error=> {
+            message=errorData.detail.map(error=> {
                 if (error.type==='string_too_short') {
                     return `Поле "${error.loc[1]}" должно содержать минимум ${error.ctx.min_length} символов`;
                 }
