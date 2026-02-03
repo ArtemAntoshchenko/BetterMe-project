@@ -65,3 +65,8 @@ async def getActiveHabits():
 async def complitActiveHabit(habit_id: int):
     await HabitDAO.complit_habit(habit_id)
     return {'message': 'Привычка на сегодня выполнена'}
+
+@router.post('/main/dailyUpdate/{habit_id}')
+async def dailyHabitStatusUpdate(habit_id: int):
+    await HabitDAO.daily_habit_status_update(habit_id)
+    return {'message': 'Прошёл день и статус привычки был обновлён'}

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Request, Response
 from ..core.auth import get_password_hash
-from ..DAO.dao_registation import UserDAO
+from ..DAO.dao_registration import UserDAO
 from ..schemas.service_schemas.reg_schema import UserRegisterSchema, UserAuthSchema
 from ..core.auth import authenticate_user, create_access_token, get_current_user
 from ..db.models import User
@@ -39,11 +39,29 @@ async def register(request: Request):
 
 @router.post('/registration')
 async def registerUser(user_data: UserRegisterSchema)-> dict:
-    user=await UserDAO.find_one_or_none(login=user_data.login)
-    if user:
+    user_login=await UserDAO.find_one_or_none(login=user_data.login)
+    if user_login:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail='Пользователь уже существует'
+        )
+    user_email=await UserDAO.find_one_or_none(email=user_data.email)
+    if user_email:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail='Эта почта уже занята'
+        )
+    user_nickname=await UserDAO.find_one_or_none(nickname=user_data.nickname)
+    if user_nickname:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail='Этот никнейм уже занят'
+        )
+    user_phone_number=await UserDAO.find_one_or_none(phone_number=user_data.phone_number)
+    if user_phone_number:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail='Этот номер уже занят'
         )
     user_dict=user_data.model_dump()
     user_dict['password']=get_password_hash(user_data.password)
@@ -54,3 +72,10 @@ async def registerUser(user_data: UserRegisterSchema)-> dict:
 async def getUserInfo(user_data: User=Depends(get_current_user)):
     return user_data
 
+@router.delete("/user/delete/{user_id}")
+async def deleteUser(user_id: int)-> dict:
+    result=await UserDAO.delete(id=user_id)
+    if result:
+        return {"message": f"Пользователь с ID {user_id} удалён!"}
+    else:
+        return {"message": "Ошибка при удалении пользователя!"}

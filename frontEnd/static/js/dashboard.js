@@ -8,6 +8,7 @@ async function getDailyListHabits() {
         const habits=await response.json();
         const listContainer=document.querySelector('#dailyHabitsList');
         listContainer.innerHTML='';
+        await dailyUpdate(habits);
         habits.forEach(habit=> {
             const habitItem=createHabitItem(habit);
             listContainer.appendChild(habitItem);
@@ -26,7 +27,6 @@ function createHabitItem(habit) {
     checkbox.className='habit-checkbox';
     checkbox.checked=habit.complit_today || false;
     checkbox.dataset.habitId=habit.id;
-    
     checkbox.addEventListener('change', async function() {
     if (this.checked) {
         const success=await complitHabit(this.dataset.habitId);
@@ -101,6 +101,31 @@ async function complitHabit(habit_id) {
         return false;
     }
 }
+
+async function dailyUpdate(habit_id) {
+    try {
+        const response=await fetch(`/dashboard/main/dailyUpdate/${habit_id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            const error=await response.json();
+            alert(error.detail || 'Ошибка ежедневного обновления статуса');
+            return false;
+        }
+        const result=await response.json();
+        alert(result.message);
+        window.location.reload()
+        return true;
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Ошибка ежедневного обновления статуса');
+        return false;
+    }
+}
+
 
 async function logoutFunction() {
     try {

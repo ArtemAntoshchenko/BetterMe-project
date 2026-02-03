@@ -14,7 +14,7 @@ class UserRegisterSchema(BaseModel):
     last_name: str=Field(..., min_length=2, max_length=20, description="Фамилия, от 2 до 20 символов")
     city: str=Field(..., min_length=3, max_length=20, description="Название города, от 3 до 20 символов")
     date_of_birth: date=Field(..., description="Дата рождения в формате ГГГГ-ММ-ДД")
-
+    
     @field_validator("phone_number")
     @classmethod
     def validate_phone_number(cls, value: str) -> str:

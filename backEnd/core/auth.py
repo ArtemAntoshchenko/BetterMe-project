@@ -2,7 +2,7 @@ from passlib.context import CryptContext
 from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
 from .config import get_auth_data
-from ..DAO.dao_registation import UserDAO
+from ..DAO.dao_registration import UserDAO
 from fastapi import Request, HTTPException, status, Depends
 import bcrypt
 

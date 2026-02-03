@@ -2,6 +2,7 @@ from .dao_base import BaseDAO
 from ..db.models import Habit
 from ..db.database import get_db
 from sqlalchemy import select
+from datetime import datetime, timedelta
  
 class HabitDAO(BaseDAO):
     model=Habit
@@ -22,3 +23,15 @@ class HabitDAO(BaseDAO):
             habit.progress=min(habit.progress+habit.step, habit.goal)
             habit.complit_today=True
             return habit
+        
+    @classmethod
+    async def daily_habit_status_update(cls, habit_id):
+        async with get_db() as session:
+            query=select(cls.model).where(cls.model.id==habit_id)
+            habit=await session.scalar(query)
+            time_since_update=datetime.now()-habit.updated_at
+        if time_since_update>=timedelta(days=1):
+            habit.complit_today=False
+            return {'message': 'Статус обновлен'}
+        else:
+            return {'message': 'Еще не прошли сутки с последнего обновления'}

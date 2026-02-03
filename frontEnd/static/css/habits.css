@@ -1,4 +1,3 @@
-/* ===== ОСНОВНЫЕ СТИЛИ ===== */
 * {
     margin: 0;
     padding: 0;
@@ -71,7 +70,7 @@ body::before {
     border-radius: 0;
     border: none;
     box-shadow: none;
-    align-items: flex-start; /* Выравнивание по верху */
+    align-items: flex-start; 
 }
 
 /* ===== ЛЕВАЯ БОКОВАЯ ПАНЕЛЬ ===== */

@@ -8,3 +8,4 @@ asyncpg
 python-jose
 bcrypt
 passlib[bcrypt]
+redis
