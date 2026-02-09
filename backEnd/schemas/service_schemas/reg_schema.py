@@ -23,7 +23,7 @@ class UserRegisterSchema(BaseModel):
         return value
     @field_validator("city")
     @classmethod
-    def validate_phone_number(cls, value: str) -> str:
+    def validate_city(cls, value: str) -> str:
         if not value[0].isupper():
             raise ValueError('Название города должно начинаться с заглавной буквы')
         return value
