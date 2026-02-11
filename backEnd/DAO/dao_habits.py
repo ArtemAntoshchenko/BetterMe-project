@@ -30,8 +30,9 @@ class HabitDAO(BaseDAO):
             query=select(cls.model).where(cls.model.id==habit_id)
             habit=await session.scalar(query)
             time_since_update=datetime.now()-habit.updated_at
-        if time_since_update>=timedelta(days=1):
-            habit.complit_today=False
-            return {'message': 'Статус обновлен'}
-        else:
-            return {'message': 'Еще не прошли сутки с последнего обновления'}
+            if time_since_update>=timedelta(days=1):
+                habit.complit_today=False
+                habit.updated_at=datetime.now()
+                return 'Статус привычек был обновлен'
+            else:
+                return 'Еще не прошли сутки с последнего обновления'

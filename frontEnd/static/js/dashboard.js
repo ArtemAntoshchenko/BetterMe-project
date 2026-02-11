@@ -12,6 +12,7 @@ async function getDailyListHabits() {
             const habitItem=createHabitItem(habit);
             listContainer.appendChild(habitItem);
         });
+        dailyUpdate(habits)
         } catch (error) {
             console.error('Ошибка:', error);
             alert('Ошибка загрузки привычек');
@@ -115,7 +116,8 @@ async function dailyUpdate(habits) {
             alert(error.detail || 'Ошибка ежедневного обновления статуса');
             continue
         }
-        window.location.reload()
+        const data=await response.json()
+        alert(data.message)
         return true;
     } catch (error) {
         console.error('Ошибка:', error);
@@ -123,7 +125,6 @@ async function dailyUpdate(habits) {
         return false;
     }
 }
-
 
 async function logoutFunction() {
     try {
@@ -144,4 +145,18 @@ async function logoutFunction() {
     }
 }
 
-getDailyListHabits()
+(function initializeApp() {
+    if (document.readyState==='loading') {
+        document.addEventListener('DOMContentLoaded', ()=> {
+            getDailyListHabits();
+        });
+    } else {
+        getDailyListHabits();
+    }
+
+    document.addEventListener('visibilitychange', ()=> {
+        if (document.visibilityState==='visible') {
+            getDailyListHabits();
+        }
+    });
+})();

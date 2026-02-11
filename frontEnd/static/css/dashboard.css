@@ -124,9 +124,6 @@ body::before {
     transition: var(--transition);
 }
 
-.user-profile:hover {
-    box-shadow: var(--shadow-hover);
-}
 
 .user-profile h1 {
     font-size: 1.8rem;
@@ -200,7 +197,6 @@ body::before {
     overflow-y: auto;
     transition: var(--transition);
 }
-
 
 .content-container {
     max-width: 1000px;
@@ -286,10 +282,6 @@ body::before {
     line-height: 18px;
 }
 
-.habit-checkbox:hover {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
-}
 
 .habit-info {
     flex: 1;
@@ -348,7 +340,6 @@ body::before {
         transparent 0%, 
         rgba(255, 255, 255, 0.3) 50%, 
         transparent 100%);
-    animation: shimmer 2s infinite;
 }
 
 .habit-item.completed {
@@ -383,7 +374,6 @@ body::before {
     align-items: center;
     justify-content: center;
 }
-
 
 .habits-container:empty::before {
     content: '📋 Ваши задачи появятся здесь';
