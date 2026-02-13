@@ -1,8 +1,9 @@
-from typing import Optional
+from typing import Optional, Dict
 from pydantic import BaseModel, Field, ConfigDict
 
 class HabitSchema(BaseModel):
     model_config=ConfigDict(from_attributes=True)
+
     id: int
     name: str=Field(..., description="Имя привычки")
     description: str=Field(..., max_length=300, description="Описание привычки")
@@ -11,3 +12,17 @@ class HabitSchema(BaseModel):
     goal: int=Field(..., description="Цель для привычки")
     progress: Optional[int]=Field(None, description="Прогресс привычки")
     step: int=Field(..., description="Шаг выполнения привычки")
+
+class HabitCompletionSchema(BaseModel):
+    model_config=ConfigDict(from_attributes=True)
+
+    habit_id: int
+    habit_name: str
+    habit_description: Optional[str]
+    goal: Optional[int]
+    progress: int
+    step: Optional[int]
+    heatmap_data: Dict[str, int]
+    current_streak: int
+    longest_streak: int
+    completion_rate: float

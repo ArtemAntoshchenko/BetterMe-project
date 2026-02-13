@@ -24,9 +24,8 @@ class UserRegisterSchema(BaseModel):
     @field_validator("city")
     @classmethod
     def validate_city(cls, value: str) -> str:
-        if not value[0].isupper():
-            raise ValueError('Название города должно начинаться с заглавной буквы')
-        return value
+        new_value=value.capitalize()
+        return new_value
     @field_validator("date_of_birth")
     def validate_date_of_birth(cls, value):
         if value and value>=datetime.now().date():
