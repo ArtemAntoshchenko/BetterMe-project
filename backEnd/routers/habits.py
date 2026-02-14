@@ -51,7 +51,7 @@ async def createNewHabit(request: Request):
     return templates.TemplateResponse(name='new_habit.html', context={'request': request, "js_url": "/static/js", "css_url": "/static/css"})
 
 @router.post('/main/createNewHabit')
-async def createNewHabit(habit_data: HabitCreateSchema)-> dict:
+async def createNewHabit(habit_data: HabitCreateSchema, profile=Depends(getUserInfo))-> dict:
     habit=await HabitDAO.find_one_or_none(name=habit_data.name)
     if habit:
         raise HTTPException(
@@ -59,6 +59,8 @@ async def createNewHabit(habit_data: HabitCreateSchema)-> dict:
             detail='Привычка с таким названием уже существует'
         )
     habit_dict=habit_data.model_dump()
+    new_habit_dict={'user_id':profile.id}
+    habit_dict.update(new_habit_dict)
     await HabitDAO.add(**habit_dict)
     await cache.clear_pattern('habits:*')
     return {'message': 'Вы успешно создали привычку!'}

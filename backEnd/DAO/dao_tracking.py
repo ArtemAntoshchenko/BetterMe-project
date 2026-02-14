@@ -1,9 +1,11 @@
 from .dao_base import BaseDAO
+from .dao_habits import HabitDAO  
 from ..db.models import HabitCompletion
 from ..db.database import get_db
-from ..schemas.model_schemas.habit_schema import HabitCompletionSchema
+from ..schemas.model_schemas.completion_habit_schema import HabitCompletionSchema
 from sqlalchemy import select
 from datetime import date, timedelta
+from typing import Dict, List
 
 class TrackingDAO(BaseDAO):
     model=HabitCompletion
@@ -56,50 +58,66 @@ class TrackingDAO(BaseDAO):
             session.add(new_completion)
             return new_completion
         
-        @classmethod
-        async def get_heatmap_data(cls, habit_id: int, days: int=365)->Dict[str, int]:
-            today=date.today()
-            start_date=today-timedelta(days=days-1)
-            async with get_db() as session:
-                query=select(cls.model.completed_date).where(
-                    cls.model.habit_id==habit_id,
-                    cls.model.completed_date>=start_date,
-                    cls.model.completed_date<=today
-                ).order_by(cls.model.completed_date)
-            result=await session.scalars(query)
-            completed_dates=set(result.all())
-            heatmap={}
-            current=start_date
-            while current<=today:
-                date_str=current.isoformat()
-                heatmap[date_str]=1 if current in completed_dates else 0
-                current+=timedelta(days=1)
-            return heatmap
+    @classmethod
+    async def get_heatmap_data(cls, habit_id: int, days: int=365)-> Dict[str, int]:
+        today=date.today()
+        start_date=today-timedelta(days=days-1)
+        async with get_db() as session:
+            query=select(cls.model.completed_date).where(
+                cls.model.habit_id==habit_id,
+                cls.model.completed_date>=start_date,
+                cls.model.completed_date<=today
+            ).order_by(cls.model.completed_date)
+        result=await session.scalars(query)
+        completed_dates=set(result.all())
+        heatmap={}
+        current=start_date
+        while current<=today:
+            date_str=current.isoformat()
+            heatmap[date_str]=1 if current in completed_dates else 0
+            current+=timedelta(days=1)
+        return heatmap
         
-        @classmethod
-        async def get_heatmap_stats(cls, habit_id: int, days: int=365)-> dict:
-            today=date.today()
-            start_date=today-timedelta(days=days-1)
-            async with get_db() as session:
-                completions=select(cls.model.completed_date).where(
-                    cls.model.habit_id==habit_id,
-                    cls.model.completed_date>=start_date,
-                    cls.model.completed_date<=today
-                ).order_by(cls.model.completed_date)
-                completions_list=completions.all()
-                if not completions_list:
-                    return {
-                        'current_streak': 0,
-                        'longest_streak': 0,
-                        'total_completions': 0,
-                        'completion_rate': 0
-                    }
-                
-                last=completions_list[-1]
-                completion_rate=round((len(completions_list)/days)*100, 1)
+    @classmethod
+    async def get_heatmap_stats(cls, habit_id: int, days: int=365)-> dict:
+        today=date.today()
+        start_date=today-timedelta(days=days-1)
+        async with get_db() as session:
+            completions=select(cls.model.completed_date).where(
+                cls.model.habit_id==habit_id,
+                cls.model.completed_date>=start_date,
+                cls.model.completed_date<=today
+            ).order_by(cls.model.completed_date)
+            completions_list=completions.all()
+            if not completions_list:
                 return {
-                'current_streak': last.current_streak,
-                'longest_streak': last.longest_streak,
-                'total_completions': len(completions_list),
-                'completion_rate': completion_rate
+                    'total_completions': 0,
+                    'completion_rate': 0
                 }
+            last=completions_list[-1]
+            completion_rate=round((len(completions_list)/days)*100, 1)
+            return {
+            'current_streak': last.current_streak,
+            'longest_streak': last.longest_streak,
+            'total_completions': len(completions_list),
+            'completion_rate': completion_rate
+            }
+        
+    @classmethod
+    async def get_all_habits_heatmap_data(cls, days: int=90)-> List[dict]:
+        async with get_db() as session:
+            habits=await HabitDAO.find_all_active()
+            result=[]
+            for habit in habits:
+                heatmap_data=await cls.get_heatmap_data(habit.id, days)
+                stats=await cls.get_heatmap_stats(habit.id, days)
+                hue=(habit.id*137)%360
+                result.append({
+                    'habit_id': habit.id,
+                    'habit_name': habit.name,
+                    'color': f"hsl({hue}, 70%, 50%)",
+                    'heatmap_data': heatmap_data,
+                    'current_streak': stats['current_streak'],
+                    'total_completions': stats['total_completions']
+                })
+            return result

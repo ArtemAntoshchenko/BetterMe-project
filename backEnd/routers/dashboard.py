@@ -8,6 +8,7 @@ from ..db.database import *
 from zoneinfo import ZoneInfo
 from datetime import timedelta
 from ..DAO.dao_habits import HabitDAO
+from ..DAO.dao_tracking import TrackingDAO
 from ..core.redis import cache
 
 router=APIRouter(prefix='/dashboard', tags=['Дашборд'])
@@ -67,8 +68,9 @@ async def getActiveHabits():
     return habits_list
 
 @router.post('/main/complitActiveHabit/{habit_id}')
-async def complitActiveHabit(habit_id: int):
-    await HabitDAO.complit_habit(habit_id)
+async def complitActiveHabit(habit_id: int, profile=Depends(getUserInfo)):
+    await HabitDAO.complit_habit(habit_id, profile.id)
+    await TrackingDAO.create_completion(habit_id, profile.id)
     await cache.clear_pattern('habits:*')
     return {'message': 'Привычка на сегодня выполнена'}
 

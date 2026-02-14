@@ -24,6 +24,7 @@ class Habit(Base):
     __tablename__ = 'habits'
 
     id: Mapped[int_pk]
+    user_id: Mapped[int]=mapped_column(ForeignKey('users.id', ondelete='CASCADE'))
     name: Mapped[str_uniq]
     description: Mapped[str]=mapped_column(Text)
     complit: Mapped[bool_False]

@@ -16,9 +16,9 @@ class HabitDAO(BaseDAO):
             return result_list
         
     @classmethod
-    async def complit_habit(cls, habit_id):
+    async def complit_habit(cls, habit_id, user_id):
         async with get_db() as session:
-            query=select(cls.model).where(cls.model.id==habit_id)
+            query=select(cls.model).where(cls.model.id==habit_id, cls.model.user_id==user_id)
             habit=await session.scalar(query)
             habit.progress=min(habit.progress+habit.step, habit.goal)
             habit.complit_today=True
