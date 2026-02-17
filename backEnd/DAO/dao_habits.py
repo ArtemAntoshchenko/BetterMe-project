@@ -3,17 +3,22 @@ from ..db.models import Habit
 from ..db.database import get_db
 from sqlalchemy import select
 from datetime import datetime, timedelta
- 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 class HabitDAO(BaseDAO):
     model=Habit
 
     @classmethod
-    async def find_all_active(cls):
-        async with get_db() as session:
+    async def find_all_active(cls, session: AsyncSession=None):
+        async def _execute(alt_session):
             query=select(cls.model).where(cls.model.complit==False)
-            result=await session.scalars(query)
-            result_list=result.all()
-            return result_list
+            result=await alt_session.scalars(query)
+            return result.all()
+        if session:
+            return await _execute(session)
+        else:
+            async with get_db() as new_session:
+                return await _execute(new_session)
         
     @classmethod
     async def complit_habit(cls, habit_id, user_id):

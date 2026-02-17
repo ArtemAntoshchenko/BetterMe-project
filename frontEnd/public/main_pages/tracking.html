@@ -3,7 +3,6 @@
     <title>Тепловая карта привычек</title>
 {% endblock %}
 {% block styles %}
-<link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css">
 <link rel="stylesheet" href="{{css_url}}/tracking.css">
 {% endblock %}
 
@@ -28,47 +27,6 @@
 {% block sidebar_right %}
 {% endblock %}
 {% block scripts %}
-<script src="https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js"></script>
-<script src="{{js_url}}/tracking.js"></script>
-<script>
-    let singleHeatmap;
-    let multiHeatmap;
-    document.addEventListener('DOMContentLoaded', () => {
-        const urlParts = window.location.pathname.split('/');
-        const habitId = urlParts[urlParts.length - 1];
-            
-        singleHeatmap = new HabitHeatmap('single-habit-heatmap');
-        multiHeatmap = new MultiHabitHeatmap('all-habits-heatmap');
-            
-            // Загружаем данные
-        const days = parseInt(document.getElementById('period').value);
-            
-        if (habitId && !isNaN(habitId) && habitId !== 'heatmap') {
-            singleHeatmap.loadHabitData(habitId, days);
-        } else {
-            document.getElementById('single-habit-heatmap').innerHTML = 
-                '<p class="loading">Выберите привычку для просмотра детальной статистики</p>';
-        }
-            
-        multiHeatmap.loadAllHabits(days);
-    });
-        
-    function changePeriod() {
-        const days = parseInt(document.getElementById('period').value);
-            
-            // Очищаем контейнеры
-        document.getElementById('single-habit-heatmap').innerHTML = '';
-        document.getElementById('all-habits-heatmap').innerHTML = '';
-            
-            // Перезагружаем с новым периодом
-        const urlParts = window.location.pathname.split('/');
-        const habitId = urlParts[urlParts.length - 1];
-            
-        if (habitId && !isNaN(habitId) && habitId !== 'heatmap') {
-            singleHeatmap.loadHabitData(habitId, days);
-        }
-            
-        multiHeatmap.loadAllHabits(days);
-    }
-</script>
+<script src="{{js_url}}/anychart-bundle.min.js"></script>
+<script defer src="{{js_url}}/tracking.js"></script>
 {% endblock %}

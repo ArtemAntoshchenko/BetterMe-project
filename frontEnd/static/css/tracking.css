@@ -1,6 +1,3 @@
-/* tracking.css */
-
-/* Импортируем переменные из основного CSS */
 :root {
     --bg-gradient: linear-gradient(135deg, #0a192f 0%, #1a1a2e 50%, #16213e 100%);
     --card-bg: rgba(17, 34, 64, 0.7);
@@ -480,4 +477,75 @@ body::before {
     padding: 8px 12px !important;
     font-size: 12px !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+}
+
+.anychart-heatmap-container {
+    width: 100%;
+    height: 350px;
+    min-height: 350px;
+    position: relative;
+    margin: 20px 0;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+#single-habit-heatmap .anychart-heatmap-container {
+    height: 400px;
+}
+
+.anychart-heatmap-container {
+    width: 100%;
+    height: 350px;
+    min-height: 350px;
+    position: relative;
+    margin: 20px 0;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+#single-habit-heatmap .anychart-heatmap-container {
+    height: 400px;
+}
+
+.habit-mini-heatmap {
+    width: 100%;
+    height: 150px;
+    min-height: 150px;
+    overflow: hidden;
+    margin: 15px 0;
+    background: #ffffff;
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+/* Стили для ячеек через CSS (безопасный способ) */
+.anychart-heatmap-cell {
+    stroke: #ffffff;
+    stroke-width: 1px;
+    rx: 2px;
+    ry: 2px;
+    transition: all 0.2s ease;
+}
+
+.anychart-heatmap-cell:hover {
+    stroke: #0366d6;
+    stroke-width: 2px;
+}
+
+/* Стили для подписей осей */
+.anychart-axis-label {
+    font-size: 11px;
+    fill: #586069;
+    font-weight: 500;
+}
+
+.anychart-axis-title {
+    font-size: 12px;
+    fill: #24292e;
+    font-weight: 600;
 }
