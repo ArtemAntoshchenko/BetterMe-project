@@ -15,11 +15,11 @@ class TrackingDAO(BaseDAO):
     async def calculate_current_streak(cls, habit_id: int, check_date: date=date.today(), 
                                     session: AsyncSession=None)-> int:
         async def _execute(sess):
-            query = select(cls.model.completed_date).where(
+            query=select(cls.model.completed_date).where(
                 cls.model.habit_id==habit_id, 
                 cls.model.completed_date>=check_date
             ).order_by(cls.model.completed_date.desc())
-            result = await sess.scalars(query)
+            result=await sess.scalars(query)
             return set(result.all())
         if session:
             completed_dates=await _execute(session)
@@ -34,55 +34,49 @@ class TrackingDAO(BaseDAO):
         return streak
 
     @classmethod
-    async def get_heatmap_data(cls, habit_id: int, days: int = 365, 
-                            session: AsyncSession = None) -> Dict[str, int]:
-        today = date.today()
-        start_date = today - timedelta(days=days-1)
-        
+    async def get_heatmap_data(cls, habit_id: int, days: int=365, 
+                            session: AsyncSession=None)-> Dict[str, int]:
+        today=date.today()
+        start_date=today-timedelta(days=days-1)
         async def _execute(sess):
-            query = select(cls.model.completed_date).where(
-                cls.model.habit_id == habit_id,
-                cls.model.completed_date >= start_date,
-                cls.model.completed_date <= today
+            query=select(cls.model.completed_date).where(
+                cls.model.habit_id==habit_id,
+                cls.model.completed_date>=start_date,
+                cls.model.completed_date<=today
             ).order_by(cls.model.completed_date)
-            result = await sess.scalars(query)
+            result=await sess.scalars(query)
             return set(result.all())
-        
         if session:
-            completed_dates = await _execute(session)
+            completed_dates=await _execute(session)
         else:
             async with get_db() as new_session:
-                completed_dates = await _execute(new_session)
-        
-        heatmap = {}
-        current = start_date
-        while current <= today:
-            date_str = current.isoformat()
-            heatmap[date_str] = 1 if current in completed_dates else 0
-            current += timedelta(days=1)
+                completed_dates=await _execute(new_session)
+        heatmap={}
+        current=start_date
+        while current<=today:
+            date_str=current.isoformat()
+            heatmap[date_str]=1 if current in completed_dates else 0
+            current+=timedelta(days=1)
         return heatmap
 
     @classmethod
-    async def get_heatmap_stats(cls, habit_id: int, days: int = 365,
-                               session: AsyncSession = None) -> dict:
-        today = date.today()
-        start_date = today - timedelta(days=days-1)
-        
+    async def get_heatmap_stats(cls, habit_id: int, days: int=365,
+                               session: AsyncSession=None)-> dict:
+        today=date.today()
+        start_date = today-timedelta(days=days-1)
         async def _execute(sess):
-            query = select(cls.model).where(
-                cls.model.habit_id == habit_id,
-                cls.model.completed_date >= start_date,
-                cls.model.completed_date <= today
+            query=select(cls.model).where(
+                cls.model.habit_id==habit_id,
+                cls.model.completed_date>=start_date,
+                cls.model.completed_date<=today
             ).order_by(cls.model.completed_date)
-            result = await sess.scalars(query)
+            result=await sess.scalars(query)
             return result.all()
-        
         if session:
-            completions_list = await _execute(session)
+            completions_list=await _execute(session)
         else:
             async with get_db() as new_session:
-                completions_list = await _execute(new_session)
-        
+                completions_list=await _execute(new_session)
         if not completions_list:
             return {
                 'total_completions': 0,
@@ -90,9 +84,8 @@ class TrackingDAO(BaseDAO):
                 'current_streak': 0,
                 'longest_streak': 0
             }
-        
-        last = completions_list[-1]
-        completion_rate = round((len(completions_list) / days) * 100, 1)
+        last=completions_list[-1]
+        completion_rate=round((len(completions_list)/days)*100, 1)
         return {
             'current_streak': last.current_streak,
             'longest_streak': last.longest_streak,
@@ -101,19 +94,14 @@ class TrackingDAO(BaseDAO):
         }
 
     @classmethod
-    async def get_all_habits_heatmap_data(cls, days: int = 90) -> List[dict]:
-        # Используем ОДНУ сессию для всего
+    async def get_all_habits_heatmap_data(cls, days: int=90)-> List[dict]:
         async with get_db() as session:
-            # Передаем сессию в HabitDAO
-            habits = await HabitDAO.find_all_active(session=session)
-            
-            result = []
+            habits=await HabitDAO.find_all_active(session=session)
+            result=[]
             for habit in habits:
-                # Передаем ту же сессию во все методы
-                heatmap_data = await cls.get_heatmap_data(habit.id, days, session=session)
-                stats = await cls.get_heatmap_stats(habit.id, days, session=session)
-                
-                hue = (habit.id * 137) % 360
+                heatmap_data=await cls.get_heatmap_data(habit.id, days, session=session)
+                stats=await cls.get_heatmap_stats(habit.id, days, session=session)
+                hue=(habit.id * 137)%360
                 result.append({
                     'habit_id': habit.id,
                     'habit_name': habit.name,
@@ -122,5 +110,4 @@ class TrackingDAO(BaseDAO):
                     'current_streak': stats['current_streak'],
                     'total_completions': stats['total_completions']
                 })
-            
             return result

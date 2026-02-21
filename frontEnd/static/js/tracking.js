@@ -206,23 +206,19 @@ class HabitHeatmap {
 
 class MultiHabitHeatmap {
     constructor(containerId) {
-        this.container = document.getElementById(containerId);
-        this.charts = [];
+        this.container=document.getElementById(containerId);
+        this.charts=[];
     }
 
-    async loadAllHabits(days = 90) {
+    async loadAllHabits(days=90) {
         try {
-            const response = await fetch(`/tracking/main/heatmaps?days=${days}`);
-            
+            const response=await fetch(`/tracking/main/heatmaps?days=${days}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
-            const data = await response.json();
-            
-            this.container.innerHTML = '';
-            
-            data.habits.forEach(habit => {
+            const data=await response.json();
+            this.container.innerHTML='';
+            data.habits.forEach(habit=> {
                 this.renderHabitCard(habit, days);
             });
         } catch (error) {
@@ -232,13 +228,12 @@ class MultiHabitHeatmap {
     }
 
     renderHabitCard(habit, days) {
-        const card = document.createElement('div');
-        card.className = 'habit-card';
-        card.style.borderLeft = `4px solid ${habit.color || '#0366d6'}`;
-        
-        const header = document.createElement('div');
-        header.className = 'habit-card-header';
-        header.innerHTML = `
+        const card=document.createElement('div');
+        card.className='habit-card';
+        card.style.borderLeft=`4px solid ${habit.color || '#0366d6'}`;
+        const header=document.createElement('div');
+        header.className='habit-card-header';
+        header.innerHTML= `
             <h3>${this.escapeHtml(habit.habit_name)}</h3>
             <div class="habit-card-stats">
                 <span class="streak">🔥 ${habit.current_streak || 0}</span>
@@ -246,96 +241,78 @@ class MultiHabitHeatmap {
             </div>
         `;
         card.appendChild(header);
-        
-        const heatmapDiv = document.createElement('div');
-        heatmapDiv.className = 'habit-mini-heatmap';
-        const uniqueId = `heatmap-${habit.habit_id}-${Date.now()}`;
-        heatmapDiv.id = uniqueId;
+        const heatmapDiv=document.createElement('div');
+        heatmapDiv.className='habit-mini-heatmap';
+        const uniqueId=`heatmap-${habit.habit_id}-${Date.now()}`;
+        heatmapDiv.id=uniqueId;
         card.appendChild(heatmapDiv);
-        
         this.container.appendChild(card);
-        
-        if (habit.heatmap_data && Object.keys(habit.heatmap_data).length > 0) {
+        if (habit.heatmap_data&&Object.keys(habit.heatmap_data).length> 0) {
             this.renderMiniHeatmap(uniqueId, habit.heatmap_data, habit.habit_name);
         } else {
-            heatmapDiv.innerHTML = '<p style="text-align: center; color: #999;">Нет данных</p>';
+            heatmapDiv.innerHTML='<p style="text-align: center; color: #999;">Нет данных</p>';
         }
     }
 
     renderMiniHeatmap(containerId, heatmapData, habitName) {
         try {
-            const dates = Object.keys(heatmapData).sort();
-            if (dates.length === 0) return;
-            
-            const startDate = new Date(dates[0]);
-            const endDate = new Date(dates[dates.length - 1]);
-            
-            const chartData = [];
-            let currentDate = new Date(startDate);
-            
-            while (currentDate <= endDate) {
-                const dateStr = currentDate.toISOString().split('T')[0];
-                let dayOfWeek = currentDate.getDay() - 1;
-                if (dayOfWeek < 0) dayOfWeek = 6;
-                
-                const weekNumber = Math.floor((currentDate - startDate) / (7 * 24 * 60 * 60 * 1000));
-                
+            const dates=Object.keys(heatmapData).sort();
+            if (dates.length===0) return;
+            const startDate=new Date(dates[0]);
+            const endDate=new Date(dates[dates.length - 1]);
+            const chartData=[];
+            let currentDate=new Date(startDate);
+            while (currentDate<=endDate) {
+                const dateStr=currentDate.toISOString().split('T')[0];
+                let dayOfWeek=currentDate.getDay() - 1;
+                if (dayOfWeek<0) dayOfWeek=6;
+                const weekNumber=Math.floor((currentDate-startDate)/(7*24*60*60*1000));
                 chartData.push([
                     weekNumber,
                     dayOfWeek,
                     heatmapData[dateStr] || 0
                 ]);
-                
-                currentDate.setDate(currentDate.getDate() + 1);
+                currentDate.setDate(currentDate.getDate()+1);
             }
-
-            const chart = anychart.heatMap(chartData);
-            
-            const xAxis = chart.xAxis();
+            const chart=anychart.heatMap(chartData);
+            const xAxis=chart.xAxis();
             xAxis.orientation('bottom');
             xAxis.labels().enabled(true);
             xAxis.labels().fontSize(9);
             xAxis.labels().format(function() {
-                return `W${this.value + 1}`;
+                return `W${this.value+1}`;
             });
-            
-            const yAxis = chart.yAxis();
+            const yAxis=chart.yAxis();
             yAxis.orientation('left');
             yAxis.labels().enabled(true);
             yAxis.labels().fontSize(9);
-            
-            const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+            const weekdays=['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
             yAxis.labels().format(function() {
                 return weekdays[this.value] || '';
             });
-            
-            const colorScale = anychart.scales.linearColor();
+            const colorScale=anychart.scales.linearColor();
             colorScale.colors(['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39']);
             chart.colorScale(colorScale);
-            
             chart.title(false);
             chart.labels().enabled(false);
             chart.legend().enabled(false);
             chart.tooltip().enabled(false);
-            
             chart.container(containerId);
             chart.draw();
-            
             this.charts.push(chart);
-            
         } catch (error) {
             console.error('Ошибка при создании мини-тепловой карты:', error);
-            const container = document.getElementById(containerId);
+            const container=document.getElementById(containerId);
             if (container) {
-                container.innerHTML = '<p style="color: red; text-align: center;">Ошибка отображения</p>';
+                container.innerHTML='<p style="color: red; text-align: center;">Ошибка отображения</p>';
             }
         }
     }
 
     escapeHtml(text) {
         if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
+        const div=document.createElement('div');
+        div.textContent=text;
         return div.innerHTML;
     }
 }
@@ -343,37 +320,30 @@ class MultiHabitHeatmap {
 let singleHeatmap;
 let multiHeatmap;
 
-document.addEventListener('DOMContentLoaded', () => {
-    const urlParts = window.location.pathname.split('/');
-    const habitId = urlParts[urlParts.length - 1];
-    
-    singleHeatmap = new HabitHeatmap('single-habit-heatmap');
-    multiHeatmap = new MultiHabitHeatmap('all-habits-heatmap');
-    
-    const days = parseInt(document.getElementById('period').value);
-    
-    if (habitId && !isNaN(habitId) && habitId !== 'heatmap') {
+document.addEventListener('DOMContentLoaded', ()=> {
+    const urlParts=window.location.pathname.split('/');
+    const habitId=urlParts[urlParts.length-1];
+    singleHeatmap=new HabitHeatmap('single-habit-heatmap');
+    multiHeatmap=new MultiHabitHeatmap('all-habits-heatmap');
+    const days=parseInt(document.getElementById('period').value);
+    if (habitId&&!isNaN(habitId)&&habitId!=='heatmap') {
         singleHeatmap.loadHabitData(habitId, days);
     } else {
-        document.getElementById('single-habit-heatmap').innerHTML = 
+        document.getElementById('single-habit-heatmap').innerHTML= 
             '<p class="loading">Выберите привычку для просмотра детальной статистики</p>';
     }
-    
     multiHeatmap.loadAllHabits(days);
 });
 
 function changePeriod() {
-    const days = parseInt(document.getElementById('period').value);
+    const days=parseInt(document.getElementById('period').value);
+    document.getElementById('single-habit-heatmap').innerHTML='';
+    document.getElementById('all-habits-heatmap').innerHTML='';
+    const urlParts=window.location.pathname.split('/');
+    const habitId=urlParts[urlParts.length-1];
     
-    document.getElementById('single-habit-heatmap').innerHTML = '';
-    document.getElementById('all-habits-heatmap').innerHTML = '';
-    
-    const urlParts = window.location.pathname.split('/');
-    const habitId = urlParts[urlParts.length - 1];
-    
-    if (habitId && !isNaN(habitId) && habitId !== 'heatmap') {
+    if (habitId&&!isNaN(habitId)&&habitId!=='heatmap') {
         singleHeatmap.loadHabitData(habitId, days);
     }
-    
     multiHeatmap.loadAllHabits(days);
 }
