@@ -9,42 +9,20 @@ from typing import Dict, List
 from sqlalchemy.ext.asyncio import AsyncSession
 
 class TrackingDAO(BaseDAO):
-    model = HabitCompletion
-
-    @classmethod
-    async def calculate_current_streak(cls, habit_id: int, check_date: date=date.today(), 
-                                    session: AsyncSession=None)-> int:
-        async def _execute(sess):
-            query=select(cls.model.completed_date).where(
-                cls.model.habit_id==habit_id, 
-                cls.model.completed_date>=check_date
-            ).order_by(cls.model.completed_date.desc())
-            result=await sess.scalars(query)
-            return set(result.all())
-        if session:
-            completed_dates=await _execute(session)
-        else:
-            async with get_db() as new_session:
-                completed_dates=await _execute(new_session)
-        streak=0
-        current_date=check_date
-        while current_date in completed_dates:
-            streak+=1
-            current_date-=timedelta(days=1)
-        return streak
+    model=HabitCompletion
 
     @classmethod
     async def get_heatmap_data(cls, habit_id: int, days: int=365, 
                             session: AsyncSession=None)-> Dict[str, int]:
         today=date.today()
         start_date=today-timedelta(days=days-1)
-        async def _execute(sess):
+        async def _execute(session):
             query=select(cls.model.completed_date).where(
                 cls.model.habit_id==habit_id,
                 cls.model.completed_date>=start_date,
                 cls.model.completed_date<=today
             ).order_by(cls.model.completed_date)
-            result=await sess.scalars(query)
+            result=await session.scalars(query)
             return set(result.all())
         if session:
             completed_dates=await _execute(session)
@@ -64,13 +42,13 @@ class TrackingDAO(BaseDAO):
                                session: AsyncSession=None)-> dict:
         today=date.today()
         start_date = today-timedelta(days=days-1)
-        async def _execute(sess):
+        async def _execute(session):
             query=select(cls.model).where(
                 cls.model.habit_id==habit_id,
                 cls.model.completed_date>=start_date,
                 cls.model.completed_date<=today
             ).order_by(cls.model.completed_date)
-            result=await sess.scalars(query)
+            result=await session.scalars(query)
             return result.all()
         if session:
             completions_list=await _execute(session)

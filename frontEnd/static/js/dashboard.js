@@ -54,7 +54,7 @@ function createHabitItem(habit) {
     const progressElement=document.createElement('div');
     progressElement.className='habit-progress';
     const progressText=document.createElement('span');
-    progressText.textContent=`Прогресс: ${habit.progress || 0}/${habit.goal} дней`;
+    progressText.textContent=`Прогресс: ${habit.progress || 0}/${habit.goal} выполнений`;
     
     const progressBar=document.createElement('div');
     progressBar.className='progress-bar';

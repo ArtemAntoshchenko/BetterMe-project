@@ -15,6 +15,7 @@ class HabitCompletionSchema(BaseModel):
     current_streak: int=Field(..., description="Стрик")
     longest_streak: int=Field(..., description="Самый длинный стрик")
     completion_rate: float=Field(..., description="Частота выполнения привычек")
+    total_completions: int=Field(..., description="Всего выполнений")
 
 class AllHabitsCompletionSchema(BaseModel):
     habits: List[dict]

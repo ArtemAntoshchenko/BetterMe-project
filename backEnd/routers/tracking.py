@@ -30,13 +30,14 @@ async def tracking(request: Request, profile=Depends(getUserInfo)):
 
 @router.get('/main/{habit_id}/heatmap', response_model=HabitCompletionSchema)
 async def get_habit_heatmap(habit_id: int, days: Optional[int]=Query(365, ge=7, le=730), profile=Depends(getUserInfo)):
-    habit=await HabitDAO.find_one_or_none(habit_id, profile.id)
+    habit=await HabitDAO.find_one_or_none(id=habit_id, user_id=profile.id)
     if not habit:
         raise HTTPException(status_code=404, detail='Привычка не найдена')
     heatmap_data=await TrackingDAO.get_heatmap_data(habit_id, days)
     stats=await TrackingDAO.get_heatmap_stats(habit_id, days)
     return HabitCompletionSchema(
         habit_id=habit.id,
+        user_id=profile.id,
         habit_name=habit.name,
         habit_description=habit.description,
         goal=habit.goal,

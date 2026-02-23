@@ -2,21 +2,32 @@ class HabitHeatmap {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.chart = null;
+        this.currentHabitId = null;
+        this.currentDays = 365;
     }
 
     async loadHabitData(habitId, days = 365) {
         try {
+            this.currentHabitId = habitId;
+            this.currentDays = days;
+            
+            // Очищаем контейнер перед загрузкой новых данных
+            this.container.innerHTML = '';
+            
             const response = await fetch(`/tracking/main/${habitId}/heatmap?days=${days}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
+            // Очищаем индикатор загрузки
+            this.container.innerHTML = '';
             
             this.renderHeader(data);
             this.renderStats(data);
             this.renderHeatmap(data.heatmap_data, data.habit_name);
         } catch (error) {
             console.error('Ошибка загрузки данных:', error);
+            this.container.innerHTML = '';
             this.showError('Не удалось загрузить данные привычки');
         }
     }
@@ -29,7 +40,7 @@ class HabitHeatmap {
             <p class="habit-description">${this.escapeHtml(data.habit_description || 'Нет описания')}</p>
             <div class="goal-progress">
                 <span class="progress-label">Прогресс:</span>
-                <span class="progress-value">${data.progress}${data.goal ? `/${data.goal}` : ''} дней</span>
+                <span class="progress-value">${data.progress}${data.goal ? `/${data.goal}` : ''} выполнений</span>
                 ${data.goal ? `<span class="goal-percentage">${Math.round((data.progress/data.goal)*100)}%</span>` : ''}
             </div>
         `;
@@ -43,8 +54,8 @@ class HabitHeatmap {
         const stats = [
             { label: 'Текущая серия', value: `${data.current_streak} ${this.pluralize(data.current_streak, 'день', 'дня', 'дней')}` },
             { label: 'Лучшая серия', value: `${data.longest_streak} ${this.pluralize(data.longest_streak, 'день', 'дня', 'дней')}` },
-            { label: 'Всего выполнений', value: data.total_completions },
-            { label: 'Выполнение', value: `${data.completion_rate}%` }
+            { label: 'Всего выполнений', value: `${data.total_completions}` },
+            { label: '% выполнения', value: `${data.completion_rate}%` }
         ];
         
         stats.forEach(stat => {
@@ -124,10 +135,14 @@ class HabitHeatmap {
         
         this.chart.labels().enabled(false);
         
+        // Сохраняем startDate для использования в заголовке тултипа
+        const tooltipStartDate = startDate;
+        
+        // Только заголовок тултипа с датой
         this.chart.tooltip().titleFormat(function() {
             const weekNum = this.x;
             const dayOfWeek = this.y;
-            const date = new Date(startDate);
+            const date = new Date(tooltipStartDate);
             date.setDate(date.getDate() + (weekNum * 7) + dayOfWeek);
             return date.toLocaleDateString('ru-RU', {
                 year: 'numeric',
@@ -135,9 +150,14 @@ class HabitHeatmap {
                 day: 'numeric'
             });
         });
-        
+
         this.chart.tooltip().format(function() {
-            return this.value === 1 ? '✅ Выполнено' : '❌ Не выполнено';
+        const index = this.index;
+        if (chartData && chartData[index]) {
+            const value = chartData[index][2];
+            return value === 1 ? '✅ Выполнено' : '❌ Не выполнено';
+        }
+        return '❌ Нет данных';
         });
         
         if (this.chart.legend) {
@@ -205,20 +225,31 @@ class HabitHeatmap {
 }
 
 class MultiHabitHeatmap {
-    constructor(containerId) {
-        this.container=document.getElementById(containerId);
-        this.charts=[];
+    constructor(containerId, onHabitClickCallback) {
+        this.container = document.getElementById(containerId);
+        this.charts = [];
+        this.onHabitClick = onHabitClickCallback; 
     }
 
-    async loadAllHabits(days=90) {
+    async loadAllHabits(days = 90) {
         try {
-            const response=await fetch(`/tracking/main/heatmaps?days=${days}`);
+            // Очищаем контейнер и показываем загрузку
+            this.container.innerHTML = '<div class="loading">Загрузка привычек...</div>';
+            
+            const response = await fetch(`/tracking/main/heatmaps?days=${days}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            const data=await response.json();
-            this.container.innerHTML='';
-            data.habits.forEach(habit=> {
+            const data = await response.json();
+            
+            this.container.innerHTML = '';
+            
+            if (data.habits.length === 0) {
+                this.container.innerHTML = '<p class="no-data">Нет активных привычек</p>';
+                return;
+            }
+            
+            data.habits.forEach(habit => {
                 this.renderHabitCard(habit, days);
             });
         } catch (error) {
@@ -228,29 +259,47 @@ class MultiHabitHeatmap {
     }
 
     renderHabitCard(habit, days) {
-        const card=document.createElement('div');
-        card.className='habit-card';
-        card.style.borderLeft=`4px solid ${habit.color || '#0366d6'}`;
-        const header=document.createElement('div');
-        header.className='habit-card-header';
-        header.innerHTML= `
-            <h3>${this.escapeHtml(habit.habit_name)}</h3>
+        const card = document.createElement('div');
+        card.className = 'habit-card';
+        card.style.borderLeft = `4px solid ${habit.color || '#0366d6'}`;
+        
+        // Делаем карточку кликабельной
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', (e) => {
+            // Предотвращаем срабатывание при клике на внутренние элементы
+            if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+                if (this.onHabitClick) {
+                    this.onHabitClick(habit.habit_id);
+                }
+            }
+        });
+        
+        const header = document.createElement('div');
+        header.className = 'habit-card-header';
+        header.innerHTML = `
+            <h3 class="clickable-habit-title" title="Нажмите для просмотра детальной статистики">
+                ${this.escapeHtml(habit.habit_name)}
+                <span class="click-hint">👆</span>
+            </h3>
             <div class="habit-card-stats">
-                <span class="streak">🔥 ${habit.current_streak || 0}</span>
-                <span class="total">📊 ${habit.total_completions || 0}</span>
+                <span class="streak" title="Текущая серия">🔥 ${habit.current_streak || 0}</span>
+                <span class="total" title="Всего выполнений">📊 ${habit.total_completions || 0}</span>
             </div>
         `;
         card.appendChild(header);
-        const heatmapDiv=document.createElement('div');
-        heatmapDiv.className='habit-mini-heatmap';
-        const uniqueId=`heatmap-${habit.habit_id}-${Date.now()}`;
-        heatmapDiv.id=uniqueId;
+        
+        const heatmapDiv = document.createElement('div');
+        heatmapDiv.className = 'habit-mini-heatmap';
+        const uniqueId = `heatmap-${habit.habit_id}-${Date.now()}`;
+        heatmapDiv.id = uniqueId;
         card.appendChild(heatmapDiv);
+        
         this.container.appendChild(card);
-        if (habit.heatmap_data&&Object.keys(habit.heatmap_data).length> 0) {
+        
+        if (habit.heatmap_data && Object.keys(habit.heatmap_data).length > 0) {
             this.renderMiniHeatmap(uniqueId, habit.heatmap_data, habit.habit_name);
         } else {
-            heatmapDiv.innerHTML='<p style="text-align: center; color: #999;">Нет данных</p>';
+            heatmapDiv.innerHTML = '<p style="text-align: center; color: #999;">Нет данных</p>';
         }
     }
 
@@ -320,30 +369,58 @@ class MultiHabitHeatmap {
 let singleHeatmap;
 let multiHeatmap;
 
-document.addEventListener('DOMContentLoaded', ()=> {
-    const urlParts=window.location.pathname.split('/');
-    const habitId=urlParts[urlParts.length-1];
-    singleHeatmap=new HabitHeatmap('single-habit-heatmap');
-    multiHeatmap=new MultiHabitHeatmap('all-habits-heatmap');
-    const days=parseInt(document.getElementById('period').value);
-    if (habitId&&!isNaN(habitId)&&habitId!=='heatmap') {
+document.addEventListener('DOMContentLoaded', () => {
+    // Создаем экземпляр HabitHeatmap
+    singleHeatmap = new HabitHeatmap('single-habit-heatmap');
+    
+    // Создаем экземпляр MultiHabitHeatmap с колбэком для клика
+    multiHeatmap = new MultiHabitHeatmap('all-habits-heatmap', (habitId) => {
+        // При клике на привычку загружаем её данные в HabitHeatmap
+        const days = parseInt(document.getElementById('period').value);
         singleHeatmap.loadHabitData(habitId, days);
+        
+        // Обновляем URL без перезагрузки страницы
+        const newUrl = `/tracking/main/${habitId}`;
+        window.history.pushState({ habitId: habitId }, '', newUrl);
+    });
+    
+    // Определяем ID привычки из URL
+    const urlParts = window.location.pathname.split('/');
+    const habitId = urlParts[urlParts.length - 1];
+    
+    const days = parseInt(document.getElementById('period').value);
+    
+    // Загружаем данные для конкретной привычки, если ID указан
+    if (habitId && !isNaN(parseInt(habitId))) {
+        singleHeatmap.loadHabitData(parseInt(habitId), days);
     } else {
-        document.getElementById('single-habit-heatmap').innerHTML= 
-            '<p class="loading">Выберите привычку для просмотра детальной статистики</p>';
+        document.getElementById('single-habit-heatmap').innerHTML = 
+            '<p class="select-hint">👆 Нажмите на название привычки, чтобы увидеть детальную статистику</p>';
     }
+    
+    // Загружаем все привычки
     multiHeatmap.loadAllHabits(days);
 });
 
 function changePeriod() {
-    const days=parseInt(document.getElementById('period').value);
-    document.getElementById('single-habit-heatmap').innerHTML='';
-    document.getElementById('all-habits-heatmap').innerHTML='';
-    const urlParts=window.location.pathname.split('/');
-    const habitId=urlParts[urlParts.length-1];
+    const days = parseInt(document.getElementById('period').value);
     
-    if (habitId&&!isNaN(habitId)&&habitId!=='heatmap') {
-        singleHeatmap.loadHabitData(habitId, days);
+    // Очищаем контейнеры
+    document.getElementById('single-habit-heatmap').innerHTML = '';
+    document.getElementById('all-habits-heatmap').innerHTML = '';
+    
+    // Получаем ID привычки из URL
+    const urlParts = window.location.pathname.split('/');
+    const habitId = urlParts[urlParts.length - 1];
+    
+    // Загружаем данные для конкретной привычки, если ID указан
+    if (habitId && !isNaN(parseInt(habitId))) {
+        singleHeatmap.loadHabitData(parseInt(habitId), days);
+    } else {
+        document.getElementById('single-habit-heatmap').innerHTML = 
+            '<p class="select-hint">👆 Нажмите на название привычки, чтобы увидеть детальную статистику</p>';
     }
+    
+    // Загружаем все привычки
     multiHeatmap.loadAllHabits(days);
 }
