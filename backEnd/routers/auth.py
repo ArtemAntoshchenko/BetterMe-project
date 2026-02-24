@@ -28,7 +28,7 @@ async def loginUser(response: Response, user_data: UserAuthSchema):
     response.set_cookie(key="users_access_token", value=access_token, httponly=True)
     return {'access_token': access_token, 'refresh_token': None}
 
-@router.post("/logout")
+@router.post('/logout')
 async def logoutUser(response: Response):
     response.delete_cookie(key="users_access_token", path="/")
     return {'message': 'Пользователь успешно вышел из системы'}

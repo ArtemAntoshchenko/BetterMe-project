@@ -2,7 +2,7 @@ from .dao_base import BaseDAO
 from .dao_habits import HabitDAO  
 from ..db.models import HabitCompletion
 from ..db.database import get_db
-from ..schemas.model_schemas.completion_habit_schema import HabitCompletionSchema
+from ..schemas.model_schemas.create_completion_schema import CreateCompletionSchema
 from sqlalchemy import select
 from datetime import date, timedelta
 from typing import Dict, List
@@ -10,6 +10,38 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 class TrackingDAO(BaseDAO):
     model=HabitCompletion
+
+    @classmethod
+    async def create_completion(cls, habit_id: int, user_id: int)-> CreateCompletionSchema:
+        today=date.today()
+        async with get_db() as session:
+            existing=await session.scalar(
+                select(cls.model).where(
+                    cls.model.habit_id==habit_id,
+                    cls.model.completed_date==today
+                )
+            )
+            if existing:
+                raise ValueError("Привычка уже отмечена сегодня")
+            last_completion=await session.scalar(
+                select(cls.model).where(
+                    cls.model.habit_id==habit_id
+                ).order_by(cls.model.completed_date.desc())
+            )
+            if last_completion and last_completion.completed_date==today-timedelta(days=1):
+                current_streak=last_completion.current_streak+1
+            else:
+                current_streak=1
+            longest_streak=max(current_streak, last_completion.longest_streak) if last_completion else current_streak
+            new_completion=cls.model(
+                habit_id=habit_id,
+                user_id=user_id,
+                completed_date=today,
+                current_streak=current_streak,
+                longest_streak=longest_streak
+            )
+            session.add(new_completion)
+            return new_completion
 
     @classmethod
     async def get_heatmap_data(cls, habit_id: int, days: int=365, 

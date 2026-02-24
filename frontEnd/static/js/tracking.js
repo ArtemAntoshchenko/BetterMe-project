@@ -1,113 +1,94 @@
 class HabitHeatmap {
     constructor(containerId) {
-        this.container = document.getElementById(containerId);
-        this.chart = null;
-        this.currentHabitId = null;
-        this.currentDays = 365;
+        this.container=document.getElementById(containerId);
+        this.chart=null;
+        this.currentHabitId=null;
+        this.currentDays=365;
     }
 
-    async loadHabitData(habitId, days = 365) {
+    async loadHabitData(habitId, days=365) {
         try {
-            this.currentHabitId = habitId;
-            this.currentDays = days;
+            this.currentHabitId=habitId;
+            this.currentDays=days;
+            this.container.innerHTML='';
             
-            // Очищаем контейнер перед загрузкой новых данных
-            this.container.innerHTML = '';
-            
-            const response = await fetch(`/tracking/main/${habitId}/heatmap?days=${days}`);
+            const response=await fetch(`/tracking/main/${habitId}/heatmap?days=${days}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            // Очищаем индикатор загрузки
-            this.container.innerHTML = '';
-            
+            this.container.innerHTML='';
             this.renderHeader(data);
             this.renderStats(data);
             this.renderHeatmap(data.heatmap_data, data.habit_name);
         } catch (error) {
             console.error('Ошибка загрузки данных:', error);
-            this.container.innerHTML = '';
+            this.container.innerHTML='';
             this.showError('Не удалось загрузить данные привычки');
         }
     }
 
     renderHeader(data) {
-        const header = document.createElement('div');
-        header.className = 'heatmap-header';
-        header.innerHTML = `
+        const header=document.createElement('div');
+        header.className='heatmap-header';
+        header.innerHTML=`
             <h2>${this.escapeHtml(data.habit_name)}</h2>
             <p class="habit-description">${this.escapeHtml(data.habit_description || 'Нет описания')}</p>
             <div class="goal-progress">
                 <span class="progress-label">Прогресс:</span>
-                <span class="progress-value">${data.progress}${data.goal ? `/${data.goal}` : ''} выполнений</span>
-                ${data.goal ? `<span class="goal-percentage">${Math.round((data.progress/data.goal)*100)}%</span>` : ''}
-            </div>
-        `;
+                <span class="progress-value">${data.progress}${data.goal ? `/${data.goal}`:''} выполнений</span>
+                ${data.goal ? `<span class="goal-percentage">${Math.round((data.progress/data.goal)*100)}%</span>`:''}
+            </div>`;
         this.container.appendChild(header);
     }
 
     renderStats(data) {
-        const statsContainer = document.createElement('div');
-        statsContainer.className = 'heatmap-stats';
-        
-        const stats = [
+        const statsContainer=document.createElement('div');
+        statsContainer.className='heatmap-stats';
+        const stats=[
             { label: 'Текущая серия', value: `${data.current_streak} ${this.pluralize(data.current_streak, 'день', 'дня', 'дней')}` },
             { label: 'Лучшая серия', value: `${data.longest_streak} ${this.pluralize(data.longest_streak, 'день', 'дня', 'дней')}` },
             { label: 'Всего выполнений', value: `${data.total_completions}` },
             { label: '% выполнения', value: `${data.completion_rate}%` }
         ];
-        
-        stats.forEach(stat => {
-            const card = document.createElement('div');
-            card.className = 'stat-card';
-            card.innerHTML = `
+        stats.forEach(stat=> {
+            const card=document.createElement('div');
+            card.className='stat-card';
+            card.innerHTML=`
                 <div class="stat-label">${stat.label}</div>
-                <div class="stat-value">${stat.value}</div>
-            `;
+                <div class="stat-value">${stat.value}</div>`;
             statsContainer.appendChild(card);
         });
-        
         this.container.appendChild(statsContainer);
     }
 
     renderHeatmap(heatmapData, habitName) {
-        const heatmapContainer = document.createElement('div');
-        heatmapContainer.className = 'anychart-heatmap-container';
-        heatmapContainer.id = `heatmap-${Date.now()}`;
-        heatmapContainer.style.height = '350px';
-        heatmapContainer.style.width = '100%';
+        const heatmapContainer=document.createElement('div');
+        heatmapContainer.className='anychart-heatmap-container';
+        heatmapContainer.id=`heatmap-${Date.now()}`;
+        heatmapContainer.style.height='350px';
+        heatmapContainer.style.width='100%';
         this.container.appendChild(heatmapContainer);
-
-        const dates = Object.keys(heatmapData).sort();
-        if (dates.length === 0) return;
-        
-        const startDate = new Date(dates[0]);
-        const endDate = new Date(dates[dates.length - 1]);
-        
-        const chartData = [];
-        
-        let currentDate = new Date(startDate);
-        while (currentDate <= endDate) {
-            const dateStr = currentDate.toISOString().split('T')[0];
-            
-            let dayOfWeek = currentDate.getDay() - 1;
-            if (dayOfWeek < 0) dayOfWeek = 6;
-            
-            const weekNumber = Math.floor((currentDate - startDate) / (7 * 24 * 60 * 60 * 1000));
-            
+        const dates=Object.keys(heatmapData).sort();
+        if (dates.length===0) return;
+        const startDate=new Date(dates[0]);
+        const endDate=new Date(dates[dates.length-1]);
+        const chartData=[];
+        let currentDate=new Date(startDate);
+        while (currentDate<=endDate) {
+            const dateStr=currentDate.toISOString().split('T')[0];
+            let dayOfWeek=currentDate.getDay()-1;
+            if (dayOfWeek<0) dayOfWeek=6;
+            const weekNumber=Math.floor((currentDate-startDate)/(7*24*60*60*1000));
             chartData.push([
                 weekNumber,
                 dayOfWeek,
                 heatmapData[dateStr] || 0
             ]);
-            
-            currentDate.setDate(currentDate.getDate() + 1);
+            currentDate.setDate(currentDate.getDate()+1);
         }
-
-        this.chart = anychart.heatMap(chartData);
-        
-        const xAxis = this.chart.xAxis();
+        this.chart=anychart.heatMap(chartData);
+        const xAxis=this.chart.xAxis();
         xAxis.orientation('bottom');
         xAxis.title('Недели');
         xAxis.labels().enabled(true);
@@ -115,71 +96,57 @@ class HabitHeatmap {
         xAxis.labels().format(function() {
             return `W${this.value + 1}`;
         });
-        
-        const yAxis = this.chart.yAxis();
+        const yAxis=this.chart.yAxis();
         yAxis.orientation('left');
         yAxis.title('День недели');
         yAxis.labels().enabled(true);
         yAxis.labels().fontSize(11);
-        
-        const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+        const weekdays=['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
         yAxis.labels().format(function() {
             return weekdays[this.value] || '';
         });
-        
         this.chart.title(habitName);
-        
-        const colorScale = anychart.scales.linearColor();
+        const colorScale=anychart.scales.linearColor();
         colorScale.colors(['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39']);
         this.chart.colorScale(colorScale);
-        
         this.chart.labels().enabled(false);
-        
-        // Сохраняем startDate для использования в заголовке тултипа
-        const tooltipStartDate = startDate;
-        
-        // Только заголовок тултипа с датой
+        const tooltipStartDate=startDate;
         this.chart.tooltip().titleFormat(function() {
-            const weekNum = this.x;
-            const dayOfWeek = this.y;
-            const date = new Date(tooltipStartDate);
-            date.setDate(date.getDate() + (weekNum * 7) + dayOfWeek);
+            const weekNum=this.x;
+            const dayOfWeek=this.y;
+            const date=new Date(tooltipStartDate);
+            date.setDate(date.getDate()+(weekNum*7)+dayOfWeek);
             return date.toLocaleDateString('ru-RU', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             });
         });
-
         this.chart.tooltip().format(function() {
-        const index = this.index;
+        const index=this.index;
         if (chartData && chartData[index]) {
-            const value = chartData[index][2];
-            return value === 1 ? '✅ Выполнено' : '❌ Не выполнено';
+            const value=chartData[index][2];
+            return value===1 ? '✅ Выполнено' : '❌ Не выполнено';
         }
         return '❌ Нет данных';
         });
-        
         if (this.chart.legend) {
             this.chart.legend().enabled(true);
             this.chart.legend().position('bottom');
         }
-        
         if (this.chart.colorRange) {
             this.chart.colorRange().enabled(true);
             this.chart.colorRange().length('15%');
         }
-        
         this.chart.container(heatmapContainer.id);
         this.chart.draw();
-
         this.renderLegend();
     }
 
     renderLegend() {
-        const legend = document.createElement('div');
-        legend.className = 'heatmap-legend';
-        legend.innerHTML = `
+        const legend=document.createElement('div');
+        legend.className='heatmap-legend';
+        legend.innerHTML=`
             <span>Меньше</span>
             <div class="legend-colors">
                 <div class="legend-color" style="background: #ebedf0;"></div>
@@ -188,36 +155,34 @@ class HabitHeatmap {
                 <div class="legend-color" style="background: #30a14e;"></div>
                 <div class="legend-color" style="background: #216e39;"></div>
             </div>
-            <span>Больше</span>
-        `;
+            <span>Больше</span>`;
         this.container.appendChild(legend);
     }
 
     showError(message) {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'error-message';
-        errorDiv.textContent = message;
+        const errorDiv=document.createElement('div');
+        errorDiv.className='error-message';
+        errorDiv.textContent=message;
         this.container.appendChild(errorDiv);
     }
 
     escapeHtml(text) {
         if (!text) return text;
-        const div = document.createElement('div');
-        div.textContent = text;
+        const div=document.createElement('div');
+        div.textContent=text;
         return div.innerHTML;
     }
 
     pluralize(count, one, few, many) {
-        const mod10 = count % 10;
-        const mod100 = count % 100;
-        
-        if (mod100 >= 11 && mod100 <= 19) {
+        const mod10=count % 10;
+        const mod100=count % 100;
+        if (mod100>=11 && mod100<=19) {
             return many;
         }
-        if (mod10 === 1) {
+        if (mod10===1) {
             return one;
         }
-        if (mod10 >= 2 && mod10 <= 4) {
+        if (mod10>=2 && mod10<=4) {
             return few;
         }
         return many;
@@ -226,57 +191,47 @@ class HabitHeatmap {
 
 class MultiHabitHeatmap {
     constructor(containerId, onHabitClickCallback) {
-        this.container = document.getElementById(containerId);
-        this.charts = [];
-        this.onHabitClick = onHabitClickCallback; 
+        this.container=document.getElementById(containerId);
+        this.charts=[];
+        this.onHabitClick=onHabitClickCallback; 
     }
 
-    async loadAllHabits(days = 90) {
+    async loadAllHabits(days=90) {
         try {
-            // Очищаем контейнер и показываем загрузку
-            this.container.innerHTML = '<div class="loading">Загрузка привычек...</div>';
-            
             const response = await fetch(`/tracking/main/heatmaps?days=${days}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            const data = await response.json();
-            
-            this.container.innerHTML = '';
-            
-            if (data.habits.length === 0) {
-                this.container.innerHTML = '<p class="no-data">Нет активных привычек</p>';
+            const data=await response.json();
+            this.container.innerHTML='';
+            if (data.habits.length===0) {
+                this.container.innerHTML='<p class="no-data">Нет активных привычек</p>';
                 return;
             }
-            
-            data.habits.forEach(habit => {
+            data.habits.forEach(habit=> {
                 this.renderHabitCard(habit, days);
             });
         } catch (error) {
             console.error('Ошибка загрузки привычек:', error);
-            this.container.innerHTML = '<p class="error-message">Ошибка загрузки данных</p>';
+            this.container.innerHTML='<p class="error-message">Ошибка загрузки данных</p>';
         }
     }
 
     renderHabitCard(habit, days) {
-        const card = document.createElement('div');
-        card.className = 'habit-card';
-        card.style.borderLeft = `4px solid ${habit.color || '#0366d6'}`;
-        
-        // Делаем карточку кликабельной
-        card.style.cursor = 'pointer';
-        card.addEventListener('click', (e) => {
-            // Предотвращаем срабатывание при клике на внутренние элементы
-            if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+        const card=document.createElement('div');
+        card.className='habit-card';
+        card.style.borderLeft=`4px solid ${habit.color || '#0366d6'}`;
+        card.style.cursor='pointer';
+        card.addEventListener('click', (e)=> {
+            if (e.target.tagName!=='A' && e.target.tagName!=='BUTTON') {
                 if (this.onHabitClick) {
                     this.onHabitClick(habit.habit_id);
                 }
             }
         });
-        
-        const header = document.createElement('div');
-        header.className = 'habit-card-header';
-        header.innerHTML = `
+        const header=document.createElement('div');
+        header.className='habit-card-header';
+        header.innerHTML=`
             <h3 class="clickable-habit-title" title="Нажмите для просмотра детальной статистики">
                 ${this.escapeHtml(habit.habit_name)}
                 <span class="click-hint">👆</span>
@@ -284,22 +239,18 @@ class MultiHabitHeatmap {
             <div class="habit-card-stats">
                 <span class="streak" title="Текущая серия">🔥 ${habit.current_streak || 0}</span>
                 <span class="total" title="Всего выполнений">📊 ${habit.total_completions || 0}</span>
-            </div>
-        `;
+            </div>`;
         card.appendChild(header);
-        
-        const heatmapDiv = document.createElement('div');
-        heatmapDiv.className = 'habit-mini-heatmap';
-        const uniqueId = `heatmap-${habit.habit_id}-${Date.now()}`;
-        heatmapDiv.id = uniqueId;
+        const heatmapDiv=document.createElement('div');
+        heatmapDiv.className='habit-mini-heatmap';
+        const uniqueId=`heatmap-${habit.habit_id}-${Date.now()}`;
+        heatmapDiv.id=uniqueId;
         card.appendChild(heatmapDiv);
-        
         this.container.appendChild(card);
-        
-        if (habit.heatmap_data && Object.keys(habit.heatmap_data).length > 0) {
+        if (habit.heatmap_data && Object.keys(habit.heatmap_data).length>0) {
             this.renderMiniHeatmap(uniqueId, habit.heatmap_data, habit.habit_name);
         } else {
-            heatmapDiv.innerHTML = '<p style="text-align: center; color: #999;">Нет данных</p>';
+            heatmapDiv.innerHTML='<p style="text-align: center; color: #999;">Нет данных</p>';
         }
     }
 
@@ -308,12 +259,12 @@ class MultiHabitHeatmap {
             const dates=Object.keys(heatmapData).sort();
             if (dates.length===0) return;
             const startDate=new Date(dates[0]);
-            const endDate=new Date(dates[dates.length - 1]);
+            const endDate=new Date(dates[dates.length-1]);
             const chartData=[];
             let currentDate=new Date(startDate);
             while (currentDate<=endDate) {
                 const dateStr=currentDate.toISOString().split('T')[0];
-                let dayOfWeek=currentDate.getDay() - 1;
+                let dayOfWeek=currentDate.getDay()-1;
                 if (dayOfWeek<0) dayOfWeek=6;
                 const weekNumber=Math.floor((currentDate-startDate)/(7*24*60*60*1000));
                 chartData.push([
@@ -369,58 +320,37 @@ class MultiHabitHeatmap {
 let singleHeatmap;
 let multiHeatmap;
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Создаем экземпляр HabitHeatmap
-    singleHeatmap = new HabitHeatmap('single-habit-heatmap');
-    
-    // Создаем экземпляр MultiHabitHeatmap с колбэком для клика
-    multiHeatmap = new MultiHabitHeatmap('all-habits-heatmap', (habitId) => {
-        // При клике на привычку загружаем её данные в HabitHeatmap
-        const days = parseInt(document.getElementById('period').value);
+document.addEventListener('DOMContentLoaded', ()=> {
+    singleHeatmap=new HabitHeatmap('single-habit-heatmap');
+    multiHeatmap=new MultiHabitHeatmap('all-habits-heatmap', (habitId)=> {
+        const days=parseInt(document.getElementById('period').value);
         singleHeatmap.loadHabitData(habitId, days);
-        
-        // Обновляем URL без перезагрузки страницы
-        const newUrl = `/tracking/main/${habitId}`;
-        window.history.pushState({ habitId: habitId }, '', newUrl);
+        const newUrl=`/tracking/main?habit=${habitId}`;
+        window.history.pushState({habitId:habitId}, '', newUrl);
     });
-    
-    // Определяем ID привычки из URL
-    const urlParts = window.location.pathname.split('/');
-    const habitId = urlParts[urlParts.length - 1];
-    
-    const days = parseInt(document.getElementById('period').value);
-    
-    // Загружаем данные для конкретной привычки, если ID указан
+    const urlParams=new URLSearchParams(window.location.search);
+    const habitId=urlParams.get('habit');
+    const days=parseInt(document.getElementById('period').value);
     if (habitId && !isNaN(parseInt(habitId))) {
         singleHeatmap.loadHabitData(parseInt(habitId), days);
     } else {
-        document.getElementById('single-habit-heatmap').innerHTML = 
+        document.getElementById('single-habit-heatmap').innerHTML= 
             '<p class="select-hint">👆 Нажмите на название привычки, чтобы увидеть детальную статистику</p>';
     }
-    
-    // Загружаем все привычки
     multiHeatmap.loadAllHabits(days);
 });
 
 function changePeriod() {
-    const days = parseInt(document.getElementById('period').value);
-    
-    // Очищаем контейнеры
-    document.getElementById('single-habit-heatmap').innerHTML = '';
-    document.getElementById('all-habits-heatmap').innerHTML = '';
-    
-    // Получаем ID привычки из URL
-    const urlParts = window.location.pathname.split('/');
-    const habitId = urlParts[urlParts.length - 1];
-    
-    // Загружаем данные для конкретной привычки, если ID указан
+    const days=parseInt(document.getElementById('period').value);
+    document.getElementById('single-habit-heatmap').innerHTML='';
+    document.getElementById('all-habits-heatmap').innerHTML='';
+    const urlParams=new URLSearchParams(window.location.search);
+    const habitId=urlParams.get('habit');
     if (habitId && !isNaN(parseInt(habitId))) {
         singleHeatmap.loadHabitData(parseInt(habitId), days);
     } else {
-        document.getElementById('single-habit-heatmap').innerHTML = 
+        document.getElementById('single-habit-heatmap').innerHTML= 
             '<p class="select-hint">👆 Нажмите на название привычки, чтобы увидеть детальную статистику</p>';
     }
-    
-    // Загружаем все привычки
     multiHeatmap.loadAllHabits(days);
 }

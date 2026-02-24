@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}
+    <title>Profile</title>
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{css_url}}/profile.css">
+{% endblock %}
+
+{% block sidebar_left %}
+    <div class="sidebar-left">
+        <nav class="navigation">
+            <h1>Навигация по сайту:</h1>
+            <div class="nav-links">
+                <a href="/dashboard/main">Главная</a>
+                <a href="/habits/main">Список привычек</a>
+                <a href="/tracking/main">Отслеживание привычек</a>
+            </div>
+        </nav>
+{% endblock %}
+
+{% block content %}
+    <main class="main-content">
+        <div class="content-container">
+            <h1>Профиль пользователя: {{ profile.nickname }}</h1>
+            <h2>Подробная информация:</h2>
+            <div class="info-container" id="info-container">
+                <ul id="userInfo">
+                </ul>
+            </div>
+        </div>
+    </main>
+{% endblock %}
+
+{% block sidebar_right %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{js_url}}/profile.js"></script>
+{% endblock %}

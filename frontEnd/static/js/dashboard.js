@@ -154,9 +154,9 @@ async function logoutFunction() {
         getDailyListHabits();
     }
 
-    document.addEventListener('visibilitychange', ()=> {
-        if (document.visibilityState==='visible') {
-            getDailyListHabits();
-        }
-    });
+    // document.addEventListener('visibilitychange', ()=> {
+    //     if (document.visibilityState==='visible') {
+    //         getDailyListHabits();
+    //     }
+    // });
 })();
