@@ -1,54 +1,46 @@
 async function getUserInfo() {
     try {
-        const response=await fetch('/habits/main/getHabits', {
+        const response=await fetch('/profile/main/info', {
             method: 'GET',
             headers: { 'Accept': 'application/json' }
         });
-        
         if (!response.ok) {
-            alert('Произошла ошибка при получении привычек или ещё не было создано ни одной привычки');
+            alert('Произошла ошибка при получении данных профиля');
             return;
         }
-        
-        const habits=await response.json();
-        const rows=document.querySelector('#tbodyHabits');
-        rows.innerHTML='';
-        
-        habits.forEach(habit=> {
-            rows.append(row(habit));
-        });
+        const profile=await response.json();
+        const listContainer=document.querySelector('#userInfo');
+        listContainer.innerHTML='';
+        const profileItem=createProfileItem(profile);
+        listContainer.appendChild(profileItem);
     } catch (error) {
         console.error('Ошибка:', error);
         alert('Произошла ошибка. Пожалуйста, попробуйте снова');
     }
 }
 
-async function createHabit() {
-    window.location.href='/habits/main/createNewHabit';
-}
-
-async function editHabit(event, habit_id, habit_name, habit_description, habit_goal) {
+async function updateProfile(event, profile_id, profile_nickname, profile_password, profile_email, profile_phone_number, profile_city) {
     event.preventDefault();
-    const newName=prompt('Введите новое название привычки:', habit_name);
-    if (!newName) return;
-    const newDescription=prompt('Введите новое описание:', habit_description || '');
-    const newGoal=prompt('Введите новую цель (количество дней):', habit_goal || '30');
-    if (!newGoal || isNaN(newGoal) || parseInt(newGoal)<= 0) {
-        alert('Цель должна быть положительным числом');
-        return;
-    }
+    const newNickname=prompt('Введите новый никнейм:', profile_nickname);
+    const newPassword=prompt('Введите новый пароль:', profile_password);
+    const newEmail=prompt('Введите новую почту:', profile_email);
+    const newPhone_number=prompt('Введите новый номер телефона:', profile_phone_number);
+    const newCity=prompt('Введите новый город:', profile_city);
+
     try {
-        const response=await fetch('/habits/main/updateHabit', {
+        const response=await fetch('/profile/main/info/update', {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                id: habit_id,
-                name: newName,
-                description: newDescription,
-                goal: parseInt(newGoal)
+                id: profile_id,
+                nickname: newNickname,
+                password: newPassword,
+                email: newEmail,
+                phone_number: newPhone_number,
+                city: newCity,
             })
         });
         if (!response.ok) {
@@ -57,12 +49,12 @@ async function editHabit(event, habit_id, habit_name, habit_description, habit_g
             return;
         }
         const result=await response.json();
-        alert('Привычка успешно обновлена!');
-        const rowToUpdate=document.querySelector(`tr[data-rowid="${habit_id}"]`);
-        if (rowToUpdate) {
-            rowToUpdate.replaceWith(row(result));
+        alert('Профиль успешно обновлен!');
+        const itemToUpdate=document.querySelector(`tr[data-rowid="${profile_id}"]`);
+        if (itemToUpdate) {
+            itemToUpdate.replaceWith(row(result));
         } else {
-            get_habits();
+            getUserInfo();
         }
     } catch (error) {
         console.error('Ошибка:', error);
@@ -70,71 +62,67 @@ async function editHabit(event, habit_id, habit_name, habit_description, habit_g
     }
 }
 
-async function deleteHabit(event, habit_id, habit_name) {
-    event.preventDefault();
-    if (!confirm(`Вы уверены, что хотите удалить привычку "${habit_name}"?`)) {
-        return;
-    }
-    try {
-        const response=await fetch(`/habits/main/delete/${habit_id}`, {
-            method: 'DELETE',
-            headers: { 'Accept': 'application/json' }
-        });
-        if (!response.ok) {
-            const errorData=await response.json();
-            alert(errorData.detail || 'Произошла ошибка при удалении привычки');
-            return;
-        }
-        const result=await response.json();
-        alert(result.message);
-        const rowToRemove=document.querySelector(`tr[data-rowid="${habit_id}"]`);
-        if (rowToRemove) {
-            rowToRemove.remove();
-        }
-    } catch (error) {
-        console.error('Ошибка:', error);
-        alert('Произошла ошибка. Пожалуйста, попробуйте снова');
-    }
-}
+function createProfileItem(profile) {
+    const li=document.createElement('li');
+    li.className='profile-item';
 
-function row(habit) {
-    const tr=document.createElement('tr');
-    tr.setAttribute('data-rowid', habit.id);
+    const profileInfo=document.createElement('div');
+    profileInfo.className='profile-info';
+    
+    const nicknameElement=document.createElement('p');
+    nicknameElement.className='profile-nickname';
+    nicknameElement.textContent=profile.nickname;
+    
+    const passwordElement=document.createElement('p');
+    passwordElement.className='profile-password';
+    passwordElement.textContent=profile.password;
 
-    const nameTd=document.createElement('td');
-    nameTd.append(habit.name);
-    tr.append(nameTd);
+    const emailElement=document.createElement('p');
+    emailElement.className='profile-email';
+    emailElement.textContent=profile.email;
 
-    const descriptionTd=document.createElement('td');
-    descriptionTd.append(habit.description || '');
-    tr.append(descriptionTd);
+    const phone_numberElement=document.createElement('p');
+    phone_numberElement.className='profile-phone_number';
+    phone_numberElement.textContent=profile.phone_number;
 
-    const goalTd=document.createElement('td');
-    goalTd.append(habit.goal || '0');
-    tr.append(goalTd);
+    const cityElement=document.createElement('p');
+    cityElement.className='profile-city';
+    cityElement.textContent=profile.city;
 
-    const progressTd=document.createElement('td');
-    progressTd.append(habit.progress || '0');
-    tr.append(progressTd);
+    profileInfo.appendChild(nicknameElement);
+    profileInfo.appendChild(passwordElement);
+    profileInfo.appendChild(emailElement);
+    profileInfo.appendChild(phone_numberElement);
+    profileInfo.appendChild(cityElement);
 
-    const actionsTd=document.createElement('td');
+    const actionsDiv=document.createElement('div');
+    profileInfo.className='profile-info';
 
-    const editButton=document.createElement('button');
-    editButton.className='edit-btn';
-    editButton.addEventListener('click', (e)=> editHabit(
+    const updateButton=document.createElement('button');
+    updateButton.className='info-change';
+    updateButton.addEventListener('click', (e)=> updateProfile(
         e, 
-        habit.id, 
-        habit.name, 
-        habit.description, 
-        habit.goal
+        profile.id, 
+        profile.nickname, 
+        profile.password, 
+        profile.email,
+        profile.phone_number,
+        profile.city
     ));
-    actionsTd.append(editButton);
-
-    const deleteButton=document.createElement('button');
-    deleteButton.className='delete-btn';
-    deleteButton.addEventListener('click', (e)=> deleteHabit(e, habit.id, habit.name));
-    actionsTd.append(deleteButton);
-
-    tr.appendChild(actionsTd);
-    return tr;
+    actionsDiv.appendChild(updateButton);
+    
+    li.appendChild(profileInfo);
+    li.appendChild(actionsDiv);
+    
+    return li;
 }
+
+(function initializeApp() {
+    if (document.readyState==='loading') {
+        document.addEventListener('DOMContentLoaded', ()=> {
+            getUserInfo();
+        });
+    } else {
+        getUserInfo();
+    }
+})();

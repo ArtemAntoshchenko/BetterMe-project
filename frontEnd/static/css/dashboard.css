@@ -185,6 +185,26 @@ body::before {
     overflow: hidden;
 }
 
+.profileInfo-button {
+    background: linear-gradient(to right, 
+        rgba(52, 152, 219, 0.8), 
+        rgba(46, 204, 113, 0.8), 
+        rgba(255, 255, 107, 0.8));
+    color: #0a192f;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: var(--transition);
+    width: 100%;
+    margin-top: auto;
+    box-shadow: 0 4px 15px rgba(255, 255, 107, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
 .main-content {
     flex: 1;
     background: var(--card-bg);

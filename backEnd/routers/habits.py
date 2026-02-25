@@ -65,10 +65,10 @@ async def createNewHabit(habit_data: HabitCreateSchema, profile=Depends(getUserI
     await cache.clear_pattern('habits:*')
     return {'message': 'Вы успешно создали привычку!'}
 
-@router.put("/main/updateHabit", response_model=HabitUpdateResponse)
+@router.put("/main/updateHabit")
 async def updateHabit(habit: HabitUpdateSchema)-> HabitUpdateResponse:
-    update_data = habit.model_dump(exclude_none=True)
-    habit_id = update_data.pop('id')
+    update_data=habit.model_dump(exclude_none=True)
+    habit_id=update_data.pop('id')
     result=await HabitDAO.update(filter_by={'id': habit_id}, **update_data)
     await cache.clear_pattern('habits:*')                             
     return result

@@ -62,7 +62,7 @@ async function editHabit(event, habit_id, habit_name, habit_description, habit_g
         if (rowToUpdate) {
             rowToUpdate.replaceWith(row(result));
         } else {
-            get_habits();
+            getHabits();
         }
     } catch (error) {
         console.error('Ошибка:', error);

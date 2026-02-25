@@ -126,6 +126,10 @@ async function dailyUpdate(habits) {
     }
 }
 
+function profileInfo() {
+    window.location.href='/profile/main';
+}
+
 async function logoutFunction() {
     try {
         let response=await fetch('/auth/logout', {

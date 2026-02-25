@@ -1,15 +1,13 @@
 from fastapi import APIRouter, Request, Depends
 import os
-from ..core.weather_api import WeatherClient
 from .auth import getUserInfo
 from os.path import dirname, abspath
 from fastapi.templating import Jinja2Templates
 from ..db.database import *
-from zoneinfo import ZoneInfo
-from datetime import timedelta
-from ..DAO.dao_habits import HabitDAO
-from ..DAO.dao_tracking import TrackingDAO
+from ..DAO.dao_registration import UserDAO
 from ..core.redis import cache
+from ..schemas.model_schemas.user_schema import UserSchema
+from ..schemas.service_schemas.profile_update_schema import ProfileUpdateSchema, ProfileUpdateResponse
 
 router=APIRouter(prefix='/profile', tags=['Профиль'])
 
@@ -27,3 +25,15 @@ async def profile(request: Request, profile=Depends(getUserInfo)):
         'profile': profile
     }
     return templates.TemplateResponse('profile.html', context)
+
+@router.get('/main/info')
+async def profileInfo(profileId)-> UserSchema:
+    info=await UserDAO.find_one_or_none(profileId)
+    return info
+
+@router.put('/main/info/update')
+async def profileInfoUpdate(profile: ProfileUpdateSchema)-> ProfileUpdateResponse:
+    update_info=profile.model_dump(exclude_none=True)
+    profile_id=update_info.pop('id')
+    result=await UserDAO.update(filter_by={'id':profile_id}, **update_info)
+    return result
