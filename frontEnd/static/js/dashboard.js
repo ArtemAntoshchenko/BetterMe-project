@@ -127,7 +127,13 @@ async function dailyUpdate(habits) {
 }
 
 function profileInfo() {
-    window.location.href='/profile/main';
+    const button=document.getElementById('profileInfo-button');
+    const profileId=button.getAttribute('data-profile-id');
+    if (profileId) {
+        window.location.href=`/profile/main/${profileId}`;
+    } else {
+        console.error('ID профиля не найден');
+    }
 }
 
 async function logoutFunction() {

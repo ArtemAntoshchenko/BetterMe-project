@@ -214,5 +214,14 @@ async function logoutFunction() {
 }
 
 
-getHabits();
-getActiveHabits();
+(function initializeApp() {
+    if (document.readyState==='loading') {
+        document.addEventListener('DOMContentLoaded', ()=> {
+            getHabits();
+            getActiveHabits()
+        });
+    } else {
+        getHabits();
+        getActiveHabits()
+    }
+})();

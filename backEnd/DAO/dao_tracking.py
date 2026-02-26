@@ -2,7 +2,7 @@ from .dao_base import BaseDAO
 from .dao_habits import HabitDAO  
 from ..db.models import HabitCompletion
 from ..db.database import get_db
-from ..schemas.model_schemas.create_completion_schema import CreateCompletionSchema
+from ..schemas.service_schemas.create_completion_schema import CreateCompletionSchema
 from sqlalchemy import select
 from datetime import date, timedelta
 from typing import Dict, List

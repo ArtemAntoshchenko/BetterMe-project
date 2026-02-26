@@ -6,6 +6,8 @@ from typing import Optional
 
 class ProfileUpdateSchema(BaseModel):
     model_config=ConfigDict(from_attributes=True)
+
+    id: int
     nickname: str=Field(..., min_length=1, max_length=15, description="Никнейм, от 1 до 15 знаков")
     password: str=Field(..., min_length=6, max_length=30, description="Пароль, от 6 до 30 знаков")
     email: EmailStr=Field(..., description="Электронная почта")
@@ -26,12 +28,12 @@ class ProfileUpdateSchema(BaseModel):
     
 class ProfileUpdateResponse(BaseModel):
     model_config=ConfigDict(from_attributes=True)
+    
+    id: int
     nickname: str=Field(..., min_length=1, max_length=15, description="Никнейм, от 1 до 15 знаков")
-    password: str=Field(..., min_length=6, max_length=30, description="Пароль, от 6 до 30 знаков")
     email: EmailStr=Field(..., description="Электронная почта")
     phone_number: str=Field(..., description="Номер телефона в международном формате, начинающийся с '+'")
     city: str=Field(..., min_length=3, max_length=20, description="Название города, от 3 до 20 символов")
-    premium: Optional[bool]=Field(None, description="Подписка")
 
     @field_validator("phone_number")
     @classmethod
