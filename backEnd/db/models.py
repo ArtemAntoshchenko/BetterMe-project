@@ -19,6 +19,7 @@ class User(Base):
     city: Mapped[str]
     date_of_birth: Mapped[date]
     premium: Mapped[bool]=mapped_column(default=False)
+    super_user: Mapped[bool]=mapped_column(default=False)
 
 class Habit(Base):
     __tablename__ = 'habits'
@@ -46,3 +47,12 @@ class HabitCompletion(Base):
     longest_streak: Mapped[int]=mapped_column(default=0)
     habit: Mapped[Habit]=relationship(back_populates='completions')
 
+class Achievement(Base):
+    __tablename__ = 'achievements'
+
+    id: Mapped[int_pk]
+    user_id: Mapped[int]=mapped_column(ForeignKey('users.id', ondelete='SET NULL'))
+    name: Mapped[str_uniq]
+    description: Mapped[str]=mapped_column(Text)
+    obtained: Mapped[bool_False]
+    

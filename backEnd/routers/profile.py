@@ -6,6 +6,7 @@ from ..core.auth import get_password_hash
 from fastapi.templating import Jinja2Templates
 from ..db.database import *
 from ..DAO.dao_registration import UserDAO
+from ..DAO.dao_achievement import AchievementDAO
 from ..core.redis import cache
 from ..schemas.model_schemas.user_schema import UserSchema
 from ..schemas.service_schemas.profile_update_schema import ProfileUpdateSchema, ProfileUpdateResponse
@@ -37,28 +38,28 @@ async def profileInfoUpdate(profile: ProfileUpdateSchema)-> ProfileUpdateRespons
     update_info=profile.model_dump(exclude_none=True)
     profile_id=update_info.pop('id')
     if 'phone_number' in update_info:
-        existing_phone_number = await UserDAO.find_one_or_none(
+        existing_phone_number=await UserDAO.find_one_or_none(
             phone_number=update_info['phone_number']
         )
-        if existing_phone_number and existing_phone_number.id != profile_id:
+        if existing_phone_number:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail='Этот номер телефона уже занят другим пользователем'
             )
     if 'email' in update_info:
-        existing_email = await UserDAO.find_one_or_none(
+        existing_email=await UserDAO.find_one_or_none(
             email=update_info['email']
         )
-        if existing_email and existing_email.id != profile_id:
+        if existing_email:
             raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail='Эта почта уже занята другим пользователем'
         )
     if 'nickname' in update_info:
-        existing_nickname = await UserDAO.find_one_or_none(
+        existing_nickname=await UserDAO.find_one_or_none(
             nickname=update_info['nickname']
         )
-        if existing_nickname and existing_nickname.id != profile_id:
+        if existing_nickname:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail='Этот никнейм уже занят другим пользователем'
@@ -66,3 +67,8 @@ async def profileInfoUpdate(profile: ProfileUpdateSchema)-> ProfileUpdateRespons
     update_info['password']=get_password_hash(profile.password)
     result=await UserDAO.update(filter_by={'id':profile_id}, **update_info)
     return result
+
+@router.get('/main/{profileId}/achievements')
+async def profileAchievements(profileId: int):
+    achievements=await AchievementDAO.find_user_all(user_id=profileId)
+    return achievements

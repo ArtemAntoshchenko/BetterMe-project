@@ -92,7 +92,7 @@ function createProfileItem(profile) {
     passwordElement.textContent=profile.password;
 
     const emailElement=document.createElement('p');
-     emailElement.id='profile-email';
+    emailElement.id='profile-email';
     emailElement.className='profile-email';
     emailElement.textContent=profile.email;
 
@@ -134,6 +134,66 @@ function createProfileItem(profile) {
     return li;
 }
 
+async function getUserAchievements(profile_id) {
+    try {
+        const response=await fetch(`/profile/main/${profile_id}/achievements`, {
+            method: 'GET',
+            headers: { 
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        });
+        if (!response.ok) {
+            alert('Произошла ошибка при получении достижений');
+            return;
+        }
+        const achievements=await response.json();
+        const listContainer=document.querySelector('#UserAchievements');
+        listContainer.innerHTML='';
+        achievements.forEach(achievement=> {
+            listContainer.append(createAchievementsItem(achievement));
+        });
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка. Пожалуйста, попробуйте снова');
+    }
+}
+
+function createAchievementsItem(achievement) {
+    const li=document.createElement('li');
+    li.className='achievement-item';
+
+    const achievementInfo=document.createElement('div');
+    achievementInfo.className='achievement-info';
+    
+    const nameElement=document.createElement('p');
+    nameElement.id='achievement-nickname';
+    nameElement.className='achievement-nickname';
+    nameElement.textContent=achievement.name;
+    
+    const descriptionElement=document.createElement('p');
+    descriptionElement.id='achievement-description';
+    descriptionElement.className='achievement-description';
+    descriptionElement.textContent=achievement.description;
+
+    const obtainedElement=document.createElement('p');
+    obtainedElement.id='achievement-obtained';
+    obtainedElement.className='achievement-obtained';
+    if (achievement.obtained==='True') {
+        obtainedElement.textContent='Получено'
+    } else {
+        obtainedElement.textContent='Не получено'
+    }
+
+    achievementInfo.appendChild(nameElement);
+    achievementInfo.appendChild(descriptionElement);
+    achievementInfo.appendChild(obtainedElement);
+
+    li.appendChild(profileInfo);
+    
+    return li;
+}
+
 function getProfileIdFromUrl() {
     const matches=window.location.pathname.match(/\/profile\/main\/(\d+)/);
     return matches ? matches[1] : null;
@@ -144,8 +204,10 @@ function getProfileIdFromUrl() {
     if (document.readyState==='loading') {
         document.addEventListener('DOMContentLoaded', ()=> {
             getUserInfo(profileId);
+            getUserAchievements(profileId)
         });
     } else {
         getUserInfo(profileId);
+        getUserAchievements(profileId)
     }
 })();
