@@ -19,7 +19,7 @@ class User(Base):
     city: Mapped[str]
     date_of_birth: Mapped[date]
     premium: Mapped[bool]=mapped_column(default=False)
-    super_user: Mapped[bool]=mapped_column(default=False)
+    super_user: Mapped[bool]=mapped_column(default=False, nullable=True)
 
 class Habit(Base):
     __tablename__ = 'habits'

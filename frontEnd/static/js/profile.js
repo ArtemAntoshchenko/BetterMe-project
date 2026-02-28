@@ -12,7 +12,7 @@ async function getUserInfo(profile_id) {
             return;
         }
         const profile=await response.json();
-        const listContainer=document.querySelector('#userInfo');
+        const listContainer=document.querySelector('#info-container');
         listContainer.innerHTML='';
         const profileItem=createProfileItem(profile);
         listContainer.appendChild(profileItem);
@@ -189,7 +189,7 @@ function createAchievementsItem(achievement) {
     achievementInfo.appendChild(descriptionElement);
     achievementInfo.appendChild(obtainedElement);
 
-    li.appendChild(profileInfo);
+    li.appendChild(achievementInfo);
     
     return li;
 }

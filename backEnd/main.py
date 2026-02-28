@@ -11,9 +11,11 @@ from .routers.tracking import router as router_tracking
 from .routers.profile import router as router_profile
 import os
 from os.path import dirname, abspath
+from .core.init_data import init_superuser
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await init_superuser()
     await cache.connect()
     yield
     await cache.close()

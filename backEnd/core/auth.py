@@ -2,6 +2,7 @@ from passlib.context import CryptContext
 from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
 from .config import get_auth_data
+from ..schemas.model_schemas.user_schema import UserSchema
 from ..DAO.dao_registration import UserDAO
 from fastapi import Request, HTTPException, status, Depends
 import bcrypt
@@ -61,3 +62,11 @@ async def get_current_user(token: str=Depends(get_token)):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Пользователь не найден')
     return user
+
+async def get_current_superuser(current_user: UserSchema=Depends(get_current_user))-> UserSchema:
+    if not current_user.super_user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Недостаточно прав. Требуются права суперпользователя."
+        )
+    return current_user

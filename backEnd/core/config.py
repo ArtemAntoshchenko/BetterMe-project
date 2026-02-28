@@ -14,6 +14,15 @@ class Settings(BaseSettings):
     REDIS_PORT: int
     REDIS_DB: int
     REDIS_PASSWORD: str=''
+    SUPERUSER_LOGIN: str
+    SUPERUSER_EMAIL: str
+    SUPERUSER_NICKNAME: str
+    SUPERUSER_PHONE: str
+    SUPERUSER_FIRST_NAME: str
+    SUPERUSER_LAST_NAME: str
+    SUPERUSER_CITY: str
+    SUPERUSER_DATE_OF_BIRTH: str
+    
     model_config=SettingsConfigDict(env_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '.env'))
 
 settings=Settings()
