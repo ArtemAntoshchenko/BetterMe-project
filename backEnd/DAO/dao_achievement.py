@@ -2,9 +2,6 @@ from .dao_base import BaseDAO
 from ..db.models import Achievement
 from ..db.database import get_db
 from sqlalchemy import select
-from datetime import date, timedelta
-from typing import Dict, List
-from sqlalchemy.ext.asyncio import AsyncSession
 
 class AchievementDAO(BaseDAO):
     model=Achievement

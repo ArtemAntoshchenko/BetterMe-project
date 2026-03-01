@@ -20,3 +20,4 @@ class UserDAO(BaseDAO):
             query=select(cls.model).where(cls.model.super_user==True)
             superuser=await session.scalar(query)
             return superuser
+        

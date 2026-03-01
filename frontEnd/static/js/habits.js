@@ -4,12 +4,10 @@ async function getHabits() {
             method: 'GET',
             headers: { 'Accept': 'application/json' }
         });
-        
         if (!response.ok) {
             alert('Произошла ошибка при получении привычек или ещё не было создано ни одной привычки');
             return;
         }
-        
         const habits=await response.json();
         const rows=document.querySelector('#tbodyHabits');
         rows.innerHTML='';

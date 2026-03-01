@@ -30,8 +30,13 @@ async def profile(request: Request, profile=Depends(getUserInfo)):
 
 @router.get('/main/{profileId}/info')
 async def profileInfo(profileId: int):
-    info=await UserDAO.find_one_or_none(id=profileId)
-    return info
+    cache_key=f'profile:{datetime.now().date()}'
+    cached=await cache.get(cache_key)
+    if cached is not None:
+        return cached
+    profile=await UserDAO.find_one_or_none(id=profileId)
+    await cache.set(cache_key, profile, expire=60)
+    return profile
 
 @router.put('/main/info/update')
 async def profileInfoUpdate(profile: ProfileUpdateSchema)-> ProfileUpdateResponse:
@@ -66,9 +71,15 @@ async def profileInfoUpdate(profile: ProfileUpdateSchema)-> ProfileUpdateRespons
             )
     update_info['password']=get_password_hash(profile.password)
     result=await UserDAO.update(filter_by={'id':profile_id}, **update_info)
+    await cache.clear_pattern('profile:*')  
     return result
 
 @router.get('/main/{profileId}/achievements')
 async def profileAchievements(profileId: int):
+    cache_key=f'achievements:{datetime.now().date()}'
+    cached=await cache.get(cache_key)
+    if cached is not None:
+        return cached
     achievements=await AchievementDAO.find_user_all(user_id=profileId)
+    await cache.set(cache_key, achievements, expire=60)
     return achievements

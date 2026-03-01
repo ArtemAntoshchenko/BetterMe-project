@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}
+    <title>Admin</title>
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{css_url}}/admin.css">
+{% endblock %}
+
+{% block sidebar_left %}
+    <div class="sidebar-left">
+        <nav class="navigation">
+            <h1>Навигация по сайту:</h1>
+            <div class="nav-links">
+                <a href="/dashboard/main">Главная</a>
+                <a href="/habits/main">Список привычек</a>
+                <a href="/tracking/main">Отслеживание привычек</a>
+            </div>
+        </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="profile-container">
+        <h1>Все профили:</h1>
+        <table>
+            <thead><tr><th>nickname</th><th>login</th><th>email</th><th>phone_number</th><th>first_name</th>
+                <th>last_name</th><th>city</th><th>date_of_birth</th><th>premium</th><th>super_user</th></tr></thead>
+            <tbody align="center" id="tbodyUsers"></tbody>
+        </table>
+    </div>
+    <div class="button-container">
+        <button type="button" id="create-button" class="create-button" onclick="createAchievement()">Создать достижение</button>
+        <button type="button" id="delete-button" class="delete-button" onclick="deleteAchievement()">Удалить достижение</button>
+    </div>
+{% endblock %}
+
+{% block sidebar_right %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{js_url}}/admin.js"></script>
+{% endblock %}
