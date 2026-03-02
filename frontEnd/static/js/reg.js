@@ -28,6 +28,10 @@ async function regFunction(event) {
     }
 }
 
+async function loginFunction() {
+    window.location.href='/auth/login';
+}
+
 function displayErrors(errorData) {
     let message='Произошла ошибка';
     if (errorData && errorData.detail) {
@@ -44,3 +48,4 @@ function displayErrors(errorData) {
     }
     alert(message);
 }
+

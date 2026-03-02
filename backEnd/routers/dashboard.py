@@ -44,7 +44,8 @@ async def dashBoard(request: Request, profile=Depends(getUserInfo)):
         'js_url': '/static/js',
         'css_url': '/static/css',
         'weather_info': city_weather,
-        'profile': profile
+        'profile': profile,
+        'is_superuser': profile.super_user
     }
     return templates.TemplateResponse('dashboard.html', context)
 

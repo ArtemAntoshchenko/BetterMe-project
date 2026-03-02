@@ -7,14 +7,6 @@ class AchievementDAO(BaseDAO):
     model=Achievement
 
     @classmethod
-    async def obtain_achievement(cls, achievement_id, user_id):
-        async with get_db() as session:
-            query=select(cls.model).where(cls.model.id==achievement_id, cls.model.user_id==user_id)
-            achievement=await session.scalar(query)
-            achievement.obtained=True
-            return achievement
-        
-    @classmethod
     async def find_user_all(cls, user_id):
         async with get_db() as session:
             query=select(cls.model).where(user_id==user_id)

@@ -25,6 +25,20 @@ async function createHabit() {
     window.location.href='/habits/main/createNewHabit';
 }
 
+function profileInfo() {
+    const button=document.getElementById('profileInfo-button');
+    const profileId=button.getAttribute('data-profile-id');
+    if (profileId) {
+        window.location.href=`/profile/main/${profileId}`;
+    } else {
+        console.error('ID профиля не найден');
+    }
+}
+
+function adminInfo() {
+    window.location.href='/admin/main';
+}
+
 async function editHabit(event, habit_id, habit_name, habit_description, habit_goal) {
     event.preventDefault();
     const newName=prompt('Введите новое название привычки:', habit_name);

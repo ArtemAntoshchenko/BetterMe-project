@@ -317,6 +317,20 @@ class MultiHabitHeatmap {
     }
 }
 
+function profileInfo() {
+    const button=document.getElementById('profileInfo-button');
+    const profileId=button.getAttribute('data-profile-id');
+    if (profileId) {
+        window.location.href=`/profile/main/${profileId}`;
+    } else {
+        console.error('ID профиля не найден');
+    }
+}
+
+function adminInfo() {
+    window.location.href='/admin/main';
+}
+
 let singleHeatmap;
 let multiHeatmap;
 

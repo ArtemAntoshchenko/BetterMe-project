@@ -49,6 +49,10 @@ async function deleteProfile(event, profile_id, profile_nickname) {
 
 async function makeSuperuser(event, profile) {
     event.preventDefault();
+    if (profile.super_user==true) {
+        alert('Профиль уже имеет права суперпользователя');
+        return;
+    }
     if (!confirm(`Вы уверены, что хотите сделать профиль "${profile.nickname}" суперпользователем?`)) {
         return;
     }
@@ -59,7 +63,7 @@ async function makeSuperuser(event, profile) {
         });
         if (!response.ok) {
             const errorData=await response.json();
-            alert(errorData.detail || 'Произошла ошибка при удалении профиля!');
+            alert(errorData.detail || 'Произошла ошибка при передаче прав суперпользователя!');
             return;
         }
         // const result=await response.json();
@@ -122,11 +126,13 @@ function row(profile) {
 
     const deleteButton=document.createElement('button');
     deleteButton.className='delete-btn';
-    deleteButton.addEventListener('click', (e)=> deleteHabit(e, profile.id, profile.nickname));
+    deleteButton.innerHTML='Удалить профиль'
+    deleteButton.addEventListener('click', (e)=> deleteProfile(e, profile.id, profile.nickname));
     actionsTd.append(deleteButton);
 
     const makeSuperuserButton=document.createElement('button');
     makeSuperuserButton.className='makeSuperuser-btn';
+    makeSuperuserButton.innerHTML='Дать профилю права суперпользователя'
     makeSuperuserButton.addEventListener('click', (e)=> makeSuperuser(e, profile));
     actionsTd.append(makeSuperuserButton);
 
@@ -134,8 +140,7 @@ function row(profile) {
     return tr;
 }
 
-async function createAchievement(event) {
-    event.preventDefault();
+async function createAchievement() {
     const Name=prompt('Введите название для достижения:');
     if (!Name) {return};
     const Description=prompt('Введите описание для достижения:');
@@ -164,8 +169,7 @@ async function createAchievement(event) {
     }
 }
 
-async function deleteAchievement(event) {
-    event.preventDefault();
+async function deleteAchievement() {
     const achievementName=prompt('Введите название достижения, которое вы хотите удалить:');
     if (!achievementName) {return}
     if (!confirm(`Вы уверены, что хотите удалить достижение "${achievementName}"?`)) {

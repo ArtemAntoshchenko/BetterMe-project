@@ -28,7 +28,10 @@
         <input type="text" id="city" name="city" required>
         <label for="date_of_birth">Дата рождения:</label>
         <input type="date" id="date_of_birth" name="date_of_birth" required>
-        <button type="submit" id="reg-button" class="submit-button" onclick="regFunction(event)">Зарегистрироваться</button></form>
+        <button type="submit" id="reg-button" class="submit-button" onclick="regFunction(event)">Зарегистрироваться</button>
+    </form>
+    <h1>Уже есть аккаунт?</h1>
+    <button type="button" id="login-button" class="login-button" onclick="loginFunction()">Войти</button>
 </div>
 <script src="{{js_url}}/reg.js"></script>
 </body>

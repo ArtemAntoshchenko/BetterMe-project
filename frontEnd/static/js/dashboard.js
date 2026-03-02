@@ -136,6 +136,10 @@ function profileInfo() {
     }
 }
 
+function adminInfo() {
+    window.location.href='/admin/main';
+}
+
 async function logoutFunction() {
     try {
         let response=await fetch('/auth/logout', {

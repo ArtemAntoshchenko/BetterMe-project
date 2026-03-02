@@ -9,6 +9,7 @@ from .routers.dashboard import router as router_dashboard
 from .routers.habits import router as router_habits
 from .routers.tracking import router as router_tracking
 from .routers.profile import router as router_profile
+from .routers.admin import router as router_admin
 import os
 from os.path import dirname, abspath
 from .core.init_data import init_superuser
@@ -38,6 +39,7 @@ app.include_router(router_dashboard)
 app.include_router(router_habits)
 app.include_router(router_tracking)
 app.include_router(router_profile)
+app.include_router(router_admin)
 
 @app.get('/')
 async def landing_page(request: Request):
