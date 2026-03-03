@@ -5,12 +5,4 @@ from sqlalchemy import select
 
 class AchievementDAO(BaseDAO):
     model=Achievement
-
-    @classmethod
-    async def find_user_all(cls, user_id):
-        async with get_db() as session:
-            query=select(cls.model).where(user_id==user_id)
-            result=await session.scalars(query)
-            result_list=result.all()
-            return result_list
         

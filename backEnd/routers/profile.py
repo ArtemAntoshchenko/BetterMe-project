@@ -6,9 +6,8 @@ from ..core.auth import get_password_hash
 from fastapi.templating import Jinja2Templates
 from ..db.database import *
 from ..DAO.dao_registration import UserDAO
-from ..DAO.dao_achievement import AchievementDAO
+from ..DAO.dao_user_achievements import UserAchievementsDAO
 from ..core.redis import cache
-from ..schemas.model_schemas.user_schema import UserSchema
 from ..schemas.service_schemas.profile_update_schema import ProfileUpdateSchema, ProfileUpdateResponse
 
 router=APIRouter(prefix='/profile', tags=['Профиль'])
@@ -74,12 +73,16 @@ async def profileInfoUpdate(profile: ProfileUpdateSchema)-> ProfileUpdateRespons
     await cache.clear_pattern('profile:*')  
     return result
 
-@router.get('/main/{profileId}/achievements')
-async def profileAchievements(profileId: int):
-    cache_key=f'achievements:{datetime.now().date()}'
+@router.get('/main/{profileId}/checkAchievements')
+async def checkProfileAchievements(profileId: int):
+    cache_key=f'checkAchievements:{datetime.now().date()}'
     cached=await cache.get(cache_key)
     if cached is not None:
         return cached
-    achievements=await AchievementDAO.find_user_all(user_id=profileId)
-    await cache.set(cache_key, achievements, expire=60)
-    return achievements
+    achievements=await UserAchievementsDAO.find_user_all(user_id=profileId)
+    if achievements:
+        await cache.set(cache_key, achievements, expire=60)
+        return achievements
+    else: 
+        obtainAchievement=
+    

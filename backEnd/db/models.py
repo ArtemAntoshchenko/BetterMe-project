@@ -1,8 +1,9 @@
-from sqlalchemy import Text, ForeignKey, UniqueConstraint
+from sqlalchemy import Text, ForeignKey, UniqueConstraint, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .database import Base, int_pk, str_uniq, int_null_true, bool_False
 from datetime import date, datetime
 from typing import List
+
 
 class Achievement(Base):
     __tablename__ = 'achievements'
@@ -10,6 +11,7 @@ class Achievement(Base):
     id: Mapped[int_pk]
     name: Mapped[str_uniq]
     description: Mapped[str]=mapped_column(Text)
+    type: Mapped[str]=mapped_column(String(50), nullable=True)
     goal: Mapped[int]=mapped_column(default=0)
     users: Mapped[List['UserAchievements']]=relationship(back_populates='achievement', cascade='all, delete-orphan')
 
@@ -40,8 +42,7 @@ class UserAchievements(Base):
     id: Mapped[int_pk]
     user_id: Mapped[int]=mapped_column(ForeignKey('users.id', ondelete='CASCADE'))
     achievement_id: Mapped[int]=mapped_column(ForeignKey('achievements.id', ondelete='CASCADE'))
-    obtained: Mapped[bool_False]
-    user: Mapped[User]=relationship(back_populates='completions')
+    user: Mapped[User]=relationship(back_populates='achievements')
     achievement: Mapped[Achievement]=relationship(back_populates='users')
 
     __table_args__ = (
