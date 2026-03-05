@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 import os
 from .auth import getUserInfo
 from os.path import dirname, abspath
@@ -9,6 +10,7 @@ from ..DAO.dao_registration import UserDAO
 from ..DAO.dao_user_achievements import UserAchievementsDAO
 from ..core.redis import cache
 from ..schemas.service_schemas.profile_update_schema import ProfileUpdateSchema, ProfileUpdateResponse
+from ..core.achievement_service import AchievementService
 
 router=APIRouter(prefix='/profile', tags=['Профиль'])
 
@@ -79,10 +81,13 @@ async def checkProfileAchievements(profileId: int):
     cached=await cache.get(cache_key)
     if cached is not None:
         return cached
-    achievements=await UserAchievementsDAO.find_user_all(user_id=profileId)
-    if achievements:
-        await cache.set(cache_key, achievements, expire=60)
-        return achievements
-    else: 
-        obtainAchievement=
+    new_achievements=await AchievementService.check_and_award_achievements(profileId)
+    all_user_achievements=await UserAchievementsDAO.find_user_all(user_id=profileId)
+    if not all_user_achievements:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "Ни одного достижения ещё не было получено"}
+        )
+    await cache.set(cache_key, all_user_achievements, expire=60)
+    return all_user_achievements
     

@@ -136,19 +136,28 @@ function createProfileItem(profile) {
 
 async function getUserAchievements(profile_id) {
     try {
-        const response=await fetch(`/profile/main/${profile_id}/achievements`, {
+        const response=await fetch(`/profile/main/${profile_id}/checkAchievements`, {
             method: 'GET',
             headers: { 
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
         });
+        if (response.status===404) {
+            const data=await response.json();
+            alert(data.message || 'Ни одного достижения ещё не было получено');
+            return;
+        }
         if (!response.ok) {
             alert('Произошла ошибка при получении достижений');
             return;
         }
         const achievements=await response.json();
         const listContainer=document.querySelector('#UserAchievements');
+        if (achievements.length===0) {
+            listContainer.innerHTML='Нет полученных достижений';
+            return;
+        }
         listContainer.innerHTML='';
         achievements.forEach(achievement=> {
             listContainer.append(createAchievementsItem(achievement));
@@ -176,18 +185,18 @@ function createAchievementsItem(achievement) {
     descriptionElement.className='achievement-description';
     descriptionElement.textContent=achievement.description;
 
-    const obtainedElement=document.createElement('p');
-    obtainedElement.id='achievement-obtained';
-    obtainedElement.className='achievement-obtained';
-    if (achievement.obtained==='True') {
-        obtainedElement.textContent='Получено'
-    } else {
-        obtainedElement.textContent='Не получено'
-    }
+    // const obtainedElement=document.createElement('p');
+    // obtainedElement.id='achievement-obtained';
+    // obtainedElement.className='achievement-obtained';
+    // if (achievement.obtained==='True') {
+    //     obtainedElement.textContent='Получено'
+    // } else {
+    //     obtainedElement.textContent='Не получено'
+    // }
 
     achievementInfo.appendChild(nameElement);
     achievementInfo.appendChild(descriptionElement);
-    achievementInfo.appendChild(obtainedElement);
+    // achievementInfo.appendChild(obtainedElement);
 
     li.appendChild(achievementInfo);
     

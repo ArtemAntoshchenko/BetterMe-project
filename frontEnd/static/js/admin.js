@@ -140,11 +140,87 @@ function row(profile) {
     return tr;
 }
 
+async function getAchievements() {
+    try {
+        const response=await fetch('/admin/main/getAchievements', {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+        });
+        if (response.status===404) {
+            const data=await response.json();
+            alert(data.message || 'Ни одного достижения ещё не было создано');
+            return;
+        }
+        if (!response.ok) {
+            alert('Произошла ошибка при получении достижений');
+            return;
+        }
+        const achievements=await response.json();
+        const listContainer=document.querySelector('#Achievements');
+        if (achievements.length===0) {
+            listContainer.innerHTML='Нет доступных достижений';
+            return;
+        }
+        listContainer.innerHTML='';
+        achievements.forEach(achievement=> {
+            listContainer.append(createAchievementsItem(achievement));
+        });
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка. Пожалуйста, попробуйте снова');
+    }
+}
+
+function createAchievementsItem(achievement) {
+    const li=document.createElement('li');
+    li.className='achievement-item';
+
+    const achievementInfo=document.createElement('div');
+    achievementInfo.className='achievement-info';
+    
+    const nameElement=document.createElement('p');
+    nameElement.id='achievement-nickname';
+    nameElement.className='achievement-nickname';
+    nameElement.textContent=achievement.name;
+    
+    const descriptionElement=document.createElement('p');
+    descriptionElement.id='achievement-description';
+    descriptionElement.className='achievement-description';
+    descriptionElement.textContent=achievement.description;
+
+    const typeElement=document.createElement('p');
+    typeElement.id='achievement-type';
+    typeElement.className='achievement-type';
+    typeElement.textContent=achievement.type;
+
+    const goalElement=document.createElement('p');
+    goalElement.id='achievement-goal';
+    goalElement.className='achievement-goal';
+    goalElement.textContent=achievement.goal;
+
+    achievementInfo.appendChild(nameElement);
+    achievementInfo.appendChild(descriptionElement);
+    achievementInfo.appendChild(typeElement);
+    achievementInfo.appendChild(goalElement);
+
+    li.appendChild(achievementInfo);
+    
+    return li;
+}
+
 async function createAchievement() {
     const Name=prompt('Введите название для достижения:');
     if (!Name) {return};
     const Description=prompt('Введите описание для достижения:');
     if (!Description) {return};
+    const Type=await selectAchievementType();
+    if (!Type) {return};
+    const Goal=prompt('Введите цель для достижения (число):');
+    if (!Goal) {return};
+    if (isNaN(Goal)) {
+        alert('Цель должна быть числом');
+        return;
+    }
     try {
         const response=await fetch('/admin/main/createAchievement', {
             method: 'POST',
@@ -155,6 +231,8 @@ async function createAchievement() {
             body: JSON.stringify({
                 name: Name,
                 description: Description,
+                type: Type,
+                goal: Goal
             })
         });
         if (!response.ok) {
@@ -166,6 +244,30 @@ async function createAchievement() {
     } catch (error) {
         console.error('Ошибка:', error);
         alert('Произошла ошибка. Пожалуйста, попробуйте снова');
+    }
+}
+
+async function selectAchievementType() {
+    try {
+        const response=await fetch('/admin/main/getAchievementTypes');
+        const types=await response.json();
+        let message='Выберите тип достижения (введите номер):\n\n';
+        types.forEach((type, index)=> {
+            message+=`${index + 1}.${type.label} (${type.value})\n`;
+        });
+        const choice=prompt(message);
+        if (!choice) return null;
+        const index=parseInt(choice)-1;
+        if (index>=0 && index<types.length) {
+            return types[index].value;
+        } else {
+            alert('Неверный выбор! Попробуйте снова.');
+            return selectAchievementType();
+        }
+    } catch (error) {
+        console.error('Ошибка при получении типов:', error);
+        alert('Не удалось получить список типов достижений');
+        return null;
     }
 }
 
@@ -197,8 +299,10 @@ async function deleteAchievement() {
     if (document.readyState==='loading') {
         document.addEventListener('DOMContentLoaded', ()=> {
             getProfiles();
+            getAchievements()
         });
     } else {
         getProfiles();
+        getAchievements()
     }
 })();

@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Request, Depends, HTTPException, status
+from fastapi import APIRouter, Request, HTTPException, status
+from fastapi.responses import JSONResponse
 import os
 from .auth import getUserInfo
 from os.path import dirname, abspath
@@ -8,8 +9,9 @@ from ..db.database import *
 from ..DAO.dao_registration import UserDAO
 from ..DAO.dao_achievement import AchievementDAO
 from ..core.redis import cache
-from ..schemas.model_schemas.user_schema import UserSchema
 from ..schemas.service_schemas.create_achievement_schema import CreateAchievementSchema
+from ..schemas.service_schemas.achievement_type_schema import AchievementTypeResponse
+from ..core.achievement_service import AchievementTypes
 
 router=APIRouter(prefix='/admin', tags=['Админпанель'])
 
@@ -51,6 +53,21 @@ async def makeSuperuser(user_id: int):
     await cache.clear_pattern('profiles:*')                             
     return new_superuser
     
+@router.get('/main/getAchievements')
+async def getAchievements():
+    cache_key=f'achievements:all:{datetime.now().date()}'
+    cached=await cache.get(cache_key)
+    if cached is not None:
+        return cached
+    achievements=await AchievementDAO.find_all()
+    if not achievements:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "Ни одного достижения ещё не было создано"}
+        )
+    await cache.set(cache_key, achievements, expire=60)
+    return achievements
+
 @router.post('/main/createAchievement')
 async def createAchievement(achievement_data: CreateAchievementSchema)-> dict:
     achievement=await AchievementDAO.find_one_or_none(name=achievement_data.name)
@@ -61,8 +78,12 @@ async def createAchievement(achievement_data: CreateAchievementSchema)-> dict:
         )
     achievement_dict=achievement_data.model_dump()
     await AchievementDAO.add(**achievement_dict)
-    await cache.clear_pattern('achievements:*')
+    await cache.clear_pattern('achievements:all:*')
     return {'message': 'Вы успешно создали достижение!'}
+
+@router.get('/main/getAchievementTypes', response_model=list[AchievementTypeResponse])
+async def get_achievement_types():
+    return AchievementTypes.get_all_types()
 
 @router.delete('/main/deleteAchievement/{achievement_name}')
 async def deleteAchievement(achievement_name: int)-> dict:
