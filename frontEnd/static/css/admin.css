@@ -1,0 +1,387 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-gradient: linear-gradient(135deg, #0a192f 0%, #1a1a2e 50%, #16213e 100%);
+    --card-bg: rgba(17, 34, 64, 0.7);
+    --border-color: rgba(100, 255, 218, 0.1);
+    --primary-color: #64ffda;
+    --text-primary: #e6f1ff;
+    --text-secondary: #8892b0;
+    --text-accent: #ccd6f6;
+    --success-color: #06d6a0;
+    --warning-color: #ffd166;
+    --danger-color: #ef476f;
+    --admin-color: #ff6b6b;
+    
+    --spacing-xs: 5px;
+    --spacing-sm: 10px;
+    --spacing-md: 20px;
+    --spacing-lg: 30px;
+    --spacing-xl: 40px;
+    
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    
+    --blur: blur(10px);
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 10% 30%, rgba(100, 255, 218, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 90% 70%, rgba(255, 107, 107, 0.05) 0%, transparent 50%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+    padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) 0;
+    gap: var(--spacing-md);
+    max-width: 1800px;
+    margin: 0;
+}
+
+.sidebar-left {
+    width: 250px;
+    flex-shrink: 0;
+}
+
+.navigation {
+    background: var(--card-bg);
+    backdrop-filter: var(--blur);
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0; 
+    padding: var(--spacing-lg);
+    border: 1px solid var(--border-color);
+    border-left: none; 
+    box-shadow: var(--shadow);
+}
+
+.navigation h1 {
+    font-size: 1.3rem;
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-md);
+    border-bottom: 2px solid rgba(100, 255, 218, 0.2);
+    padding-bottom: var(--spacing-sm);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.nav-links a {
+    color: var(--text-accent);
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid transparent;
+    transition: var(--transition);
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.main-content {
+    flex: 1;
+    background: var(--card-bg);
+    backdrop-filter: var(--blur);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+}
+
+.content-container {
+    width: 100%;
+}
+
+.profile-container h1 {
+    font-size: 2rem;
+    color: var(--admin-color);
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 2px solid rgba(255, 107, 107, 0.2);
+    padding-bottom: var(--spacing-sm);
+    position: relative;
+}
+
+.profile-container h1::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 60px;
+    height: 2px;
+    background: var(--admin-color);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+thead {
+    background: rgba(255, 107, 107, 0.1);
+}
+
+thead th {
+    color: var(--admin-color);
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: var(--spacing-md);
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--admin-color);
+    white-space: nowrap;
+}
+
+tbody td {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.delete-btn,
+.makeSuperuser-btn {
+    border: none;
+    padding: 8px 12px;
+    margin: 4px;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+    min-width: 100px;
+    font-weight: 600;
+}
+
+.delete-btn {
+    background: linear-gradient(135deg, var(--danger-color), #ff8c8c);
+    color: white;
+    box-shadow: 0 2px 8px rgba(239, 71, 111, 0.3);
+}
+
+.makeSuperuser-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+    color: #0a192f;
+    box-shadow: 0 2px 8px rgba(100, 255, 218, 0.3);
+}
+
+.sidebar-right {
+    width: 320px;
+    flex-shrink: 0;
+}
+
+.achievement-container {
+    background: var(--card-bg);
+    backdrop-filter: var(--blur);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+}
+
+.achievement-container h1 {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-md);
+    border-bottom: 2px solid rgba(100, 255, 218, 0.2);
+    padding-bottom: var(--spacing-sm);
+}
+
+.achievement-content {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.achievement-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.achievement-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.achievement-content::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 3px;
+}
+
+#Achievements {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.achievement-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+    list-style: none;
+}
+
+.achievement-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+#achievement-nickname {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 var(--spacing-xs) 0;
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px dashed var(--border-color);
+}
+
+#achievement-nickname::before {
+    content: '🏆 ';
+    color: var(--warning-color);
+}
+
+#achievement-description {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.4;
+}
+
+#achievement-description::before {
+    content: '📝 ';
+    color: var(--text-accent);
+    opacity: 0.7;
+}
+
+#achievement-type {
+    color: var(--warning-color);
+    font-size: 0.85rem;
+    margin: var(--spacing-xs) 0 0 0;
+    display: inline-block;
+    background: rgba(255, 209, 102, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 209, 102, 0.2);
+    max-width: fit-content;
+}
+
+#achievement-type::before {
+    content: '📌 Тип: ';
+    color: var(--text-secondary);
+}
+
+#achievement-goal {
+    color: var(--success-color);
+    font-size: 0.85rem;
+    margin: var(--spacing-xs) 0 0 0;
+    display: inline-block;
+    background: rgba(6, 214, 160, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(6, 214, 160, 0.2);
+    max-width: fit-content;
+}
+
+#achievement-goal::before {
+    content: '🎯 Цель: ';
+    color: var(--text-secondary);
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-color);
+}
+
+.create-button,
+.delete-button {
+    border: none;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.create-button {
+    background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+    color: #0a192f;
+    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.3);
+}
+
+.delete-button {
+    background: linear-gradient(135deg, var(--danger-color), var(--admin-color));
+    color: white;
+    box-shadow: 0 4px 15px rgba(239, 71, 111, 0.3);
+}
+
+#Achievements:empty {
+    display: block;
+    padding: var(--spacing-lg);
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+    border: 1px dashed var(--border-color);
+}
+
+#Achievements:empty::before {
+    content: '📋 Список достижений пуст';
+}
+
+[data-premium="true"],
+[data-superuser="true"] {
+    color: var(--success-color) !important;
+    font-weight: 600;
+}
+
+[data-premium="false"],
+[data-superuser="false"] {
+    color: var(--text-secondary) !important;
+}

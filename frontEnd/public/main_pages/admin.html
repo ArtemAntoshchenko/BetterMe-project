@@ -17,6 +17,7 @@
                 <a href="/tracking/main">Отслеживание привычек</a>
             </div>
         </nav>
+    </div>
 {% endblock %}
 
 {% block content %}
@@ -28,20 +29,20 @@
             <tbody align="center" id="tbodyUsers"></tbody>
         </table>
     </div>
-    <div class="achievement-container">
-        <h1>Все достижения:</h1>
-        <div class="achievement-content">
-            <ul id="Achievements">
-            </ul>
-        </div>
+{% endblock %}
+
+{% block sidebar_right %}
+<div class="achievement-container">
+    <h1>Все достижения:</h1>
+    <div class="achievement-content">
+        <ul id="Achievements">
+        </ul>
     </div>
     <div class="button-container">
         <button type="button" id="create-button" class="create-button" onclick="createAchievement()">Создать достижение</button>
         <button type="button" id="delete-button" class="delete-button" onclick="deleteAchievement()">Удалить достижение</button>
     </div>
-{% endblock %}
-
-{% block sidebar_right %}
+</div>
 {% endblock %}
 
 {% block scripts %}

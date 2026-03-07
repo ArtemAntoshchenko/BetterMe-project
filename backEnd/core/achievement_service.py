@@ -29,10 +29,10 @@ class AchievementService:
             return []
         all_achievements=await AchievementDAO.find_all()
         user_achievements=await UserAchievementsDAO.find_user_all(user_id=user_id)
-        earned_achievements={user_achievement.achievement_id for user_achievement in user_achievements}
+        earned_achievements_id={user_achievement.achievement_id for user_achievement in user_achievements}
         new_achievements=[]
         for achievement in all_achievements:
-            if achievement.id in earned_achievements:
+            if achievement.id in earned_achievements_id:
                 continue 
             if await cls._check_achievement_condition(user, achievement):
                 new_achievement=await UserAchievementsDAO.add(
@@ -67,10 +67,7 @@ class AchievementService:
             1 for field in fields_to_check 
             if field and str(field).strip()
             )
-        if achievement.goal>0:
-            return filled_fields>=achievement.goal
-        else:
-            return filled_fields>=len(fields_to_check)
+        return filled_fields>=achievement.goal if achievement.goal>0 else filled_fields>=len(fields_to_check)
         
     @classmethod
     async def _check_longest_streak(cls, user: User, achievement: Achievement)-> bool:

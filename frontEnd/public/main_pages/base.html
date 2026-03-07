@@ -28,18 +28,21 @@
                     <p><strong>Полное имя:</strong> {{ profile.first_name }} {{ profile.last_name }}</p>
                     <p><strong>Email:</strong> {{ profile.email }}</p>
                 </div>
-                <button type="button" id="logout-button" class="logout-button" onclick="logoutFunction()">Выйти</button>
-                <button type="button" id="profileInfo-button" class="profileInfo-button" data-profile-id="{{ profile.id }}" onclick="profileInfo()">Подробная информация</button>
+                <div class="user-profile-buttons">
+                    <button type="button" id="logout-button" class="logout-button" onclick="logoutFunction()">Выйти</button>
+                    <button type="button" id="profileInfo-button" class="profileInfo-button" data-profile-id="{{ profile.id }}" onclick="profileInfo()">Подробная информация</button>
+                </div>
             </div>
-            <div class="admin-profile">
-                {% if is_superuser %}
+            {% if is_superuser %}
+                <div class="admin-profile">
                     <h1>Админ панель:</h1>
                     <button type="button" id="admin-button" class="admin-button" onclick="adminInfo()">Подробная информация</button>
-                {% endif %}
-            </div>
+                </div>
+            {% endif %}
         </div>
         {% endblock %}
-        {% block content %}{% endblock %}
+        {% block content %}
+        {% endblock %}
         {% block sidebar_right %}
         <div class="sidebar-right">
             <div class="weather-widget">
@@ -58,6 +61,6 @@
         </div>
         {% endblock %}
     </div>
-{% block scripts %}{% endblock %}
+    {% block scripts %}{% endblock %}
 </body>
 </html>

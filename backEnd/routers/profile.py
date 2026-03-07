@@ -7,6 +7,7 @@ from ..core.auth import get_password_hash
 from fastapi.templating import Jinja2Templates
 from ..db.database import *
 from ..DAO.dao_registration import UserDAO
+from ..DAO.dao_achievement import AchievementDAO
 from ..DAO.dao_user_achievements import UserAchievementsDAO
 from ..core.redis import cache
 from ..schemas.service_schemas.profile_update_schema import ProfileUpdateSchema, ProfileUpdateResponse
@@ -82,12 +83,21 @@ async def checkProfileAchievements(profileId: int):
     if cached is not None:
         return cached
     new_achievements=await AchievementService.check_and_award_achievements(profileId)
-    all_user_achievements=await UserAchievementsDAO.find_user_all(user_id=profileId)
-    if not all_user_achievements:
+    user_achievements=await UserAchievementsDAO.find_user_all(user_id=profileId)
+    if not user_achievements:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"message": "Ни одного достижения ещё не было получено"}
         )
-    await cache.set(cache_key, all_user_achievements, expire=60)
-    return all_user_achievements
+    achievements_list=[]
+    for user_achievement in user_achievements:
+        achievement=await AchievementDAO.find_one_or_none(id=user_achievement.achievement_id)
+        if achievement:
+            achievements_list.append({
+                "id": achievement.id,
+                "name": achievement.name,
+                "description": achievement.description
+            })
+    await cache.set(cache_key, achievements_list, expire=60)
+    return achievements_list
     

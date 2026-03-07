@@ -16,7 +16,10 @@ class TrackingDAO(BaseDAO):
         async with get_db() as session:
             query=select(cls.model).where(cls.model.user_id==user_id)
             result=await session.scalar(query)
-            return result.longest_streak
+            if result:
+                return result.longest_streak
+            else:
+                return 0
 
     @classmethod
     async def create_completion(cls, habit_id: int, user_id: int)-> CreateCompletionSchema:

@@ -7,8 +7,32 @@
     <link rel="stylesheet" href="{{css_url}}/habits.css">
 {% endblock %}
 
+{% block sidebar_left %}
+    <div class="sidebar-left">
+        <nav class="navigation">
+            <h1>Навигация по сайту:</h1>
+            <div class="nav-links">
+                <a href="/dashboard/main">Главная</a>
+                <a href="/habits/main">Список привычек</a>
+                <a href="/tracking/main">Отслеживание привычек</a>
+            </div>
+        </nav>
+        <div class="user-profile">
+            <h1>Мой профиль:</h1>
+            <div class="user-info">
+                <h2>ID: {{ profile.id }}</h2>
+                <p><strong>Никнейм:</strong> {{ profile.nickname }}</p>
+                <p><strong>Полное имя:</strong> {{ profile.first_name }} {{ profile.last_name }}</p>
+                <p><strong>Email:</strong> {{ profile.email }}</p>
+            </div>
+            <div class="user-profile-buttons">
+                <button type="button" id="logout-button" class="logout-button" onclick="logoutFunction()">Выйти</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
 {% block content %}
-     <div class="habits-container">
+    <div class="habits-container">
         <div class="habit-section">
             <h2>Все привычки:</h2>
             <table>

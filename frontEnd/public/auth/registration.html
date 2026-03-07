@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="{{css_url}}/reg.css">
 </head>
 <body>
+<div class="top-right-block">
+    <h1 class="account-question">Уже есть аккаунт?</h1>
+    <button type="button" id="login-button" class="login-button" onclick="loginFunction()">Войти</button>
+</div>
 <div class="container">
     <h1>Регистрация:</h1>
     <form id="registration-form" class="registration-form">
@@ -30,8 +34,6 @@
         <input type="date" id="date_of_birth" name="date_of_birth" required>
         <button type="submit" id="reg-button" class="submit-button" onclick="regFunction(event)">Зарегистрироваться</button>
     </form>
-    <h1>Уже есть аккаунт?</h1>
-    <button type="button" id="login-button" class="login-button" onclick="loginFunction()">Войти</button>
 </div>
 <script src="{{js_url}}/reg.js"></script>
 </body>
