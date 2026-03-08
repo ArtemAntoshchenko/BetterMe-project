@@ -83,7 +83,7 @@ class TrackingDAO(BaseDAO):
     async def get_heatmap_stats(cls, habit_id: int, days: int=365,
                                session: AsyncSession=None)-> dict:
         today=date.today()
-        start_date = today-timedelta(days=days-1)
+        start_date=today-timedelta(days=days-1)
         async def _execute(session):
             query=select(cls.model).where(
                 cls.model.habit_id==habit_id,
@@ -114,9 +114,9 @@ class TrackingDAO(BaseDAO):
         }
 
     @classmethod
-    async def get_all_habits_heatmap_data(cls, days: int=90)-> List[dict]:
+    async def get_all_habits_heatmap_data(cls, user_id: int, days: int=90)-> List[dict]:
         async with get_db() as session:
-            habits=await HabitDAO.find_all_active(session=session)
+            habits=await HabitDAO.find_all_active(session=session, profile_id=user_id)
             result=[]
             for habit in habits:
                 heatmap_data=await cls.get_heatmap_data(habit.id, days, session=session)

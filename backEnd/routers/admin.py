@@ -41,15 +41,15 @@ async def profilesInfo():
 
 @router.delete('/main/delete/{user_id}')
 async def profileDelete(user_id: int)-> dict:
-    result=UserDAO.delete(id=user_id)
+    result=await UserDAO.delete(id=user_id)
     if result:
         return {"message": f"Профиль с ID {user_id} удалён!"}
     else:
         return {"message": "Ошибка при удалении профиля!"}
 
-@router.put("/main/makeSuperuser")
+@router.put("/main/makeSuperuser/{user_id}")
 async def makeSuperuser(user_id: int):
-    new_superuser=await UserDAO.changeUserStatus(id=user_id)
+    new_superuser=await UserDAO.changeUserStatus(user_id)
     await cache.clear_pattern('profiles:*')                             
     return new_superuser
     
@@ -87,7 +87,7 @@ async def get_achievement_types():
 
 @router.delete('/main/deleteAchievement/{achievement_name}')
 async def deleteAchievement(achievement_name: int)-> dict:
-    result=AchievementDAO.delete(name=achievement_name)
+    result=await AchievementDAO.delete(name=achievement_name)
     if result:
         return {"message": f"Достижение {achievement_name} удалено!"}
     else:

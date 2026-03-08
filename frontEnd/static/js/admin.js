@@ -57,17 +57,18 @@ async function makeSuperuser(event, profile) {
         return;
     }
     try {
-        const response=await fetch(`/admin/main/delete/${profile.id}`, {
-            method: 'DELETE',
+        const response=await fetch(`/admin/main/makeSuperuser/${profile.id}`, {
+            method: 'PUT',
             headers: { 'Accept': 'application/json' }
         });
         if (!response.ok) {
             const errorData=await response.json();
             alert(errorData.detail || 'Произошла ошибка при передаче прав суперпользователя!');
             return;
+        } else {
+            alert('Пользователь стал суперюзером!');
+            window.location.reload()
         }
-        // const result=await response.json();
-        alert('Пользователь стал суперюзером!');
         const rowToUpdate=document.querySelector(`tr[data-rowid="${profile.id}"]`);
         if (rowToUpdate) {
             rowToUpdate.replaceWith(row(profile));

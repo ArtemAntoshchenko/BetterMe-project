@@ -50,13 +50,13 @@ async def dashBoard(request: Request, profile=Depends(getUserInfo)):
     return templates.TemplateResponse('dashboard.html', context)
 
 @router.get('/main/getActiveHabits')
-async def getActiveHabits():
+async def getActiveHabits(profile=Depends(getUserInfo)):
     cache_key='habits:active'
     cached=await cache.get(cache_key)
     if cached is not None:
         print('Информация взята из кэша')
         return cached
-    result=await HabitDAO.find_all_active()
+    result=await HabitDAO.find_all_active(profile.id)
     habits_list=[{
         'id': habit.id,
         'name': habit.name,

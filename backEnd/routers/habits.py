@@ -27,22 +27,22 @@ async def habits(request: Request, profile=Depends(getUserInfo)):
     return templates.TemplateResponse('habits.html', context)
 
 @router.get('/main/getHabits')
-async def getHabits()-> list[HabitSchema]:
+async def getHabits(profile=Depends(getUserInfo))-> list[HabitSchema]:
     cache_key=f'habits:all:{datetime.now().date()}'
     cached=await cache.get(cache_key)
     if cached is not None:
         return cached
-    habits=await HabitDAO.find_all()
+    habits=await HabitDAO.find_all(profile_id=profile.id)
     await cache.set(cache_key, habits, expire=60)
     return habits
 
 @router.get('/main/getActiveHabits')
-async def getActiveHabits()-> list[HabitSchema]:
+async def getActiveHabits(profile=Depends(getUserInfo))-> list[HabitSchema]:
     cache_key=f'habits:active:{datetime.now().date()}'
     cached=await cache.get(cache_key)
     if cached is not None:
         return cached
-    habits_active=await HabitDAO.find_all_active()
+    habits_active=await HabitDAO.find_all_active(profile_id=profile.id)
     await cache.set(cache_key, habits_active, expire=60)
     return habits_active
 

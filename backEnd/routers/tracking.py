@@ -52,6 +52,6 @@ async def get_habit_heatmap(habit_id: int, days: Optional[int]=Query(365, ge=7, 
 
 @router.get('/main/heatmaps', response_model=AllHabitsCompletionSchema)
 async def get_all_habits_heatmaps(days: Optional[int]=Query(90, ge=7, le=365), profile=Depends(getUserInfo)):
-    habits_data=await TrackingDAO.get_all_habits_heatmap_data(days)
+    habits_data=await TrackingDAO.get_all_habits_heatmap_data(profile.id, days)
     return AllHabitsCompletionSchema(habits=habits_data)
 
