@@ -30,7 +30,7 @@
 - **База данных:**
   - [asyncpg (PostgreSQL)](https://github.com/MagicStack/asyncpg) — асинхронный драйвер для PostgreSQL.
 - **Инфраструктура:**
-  - [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/) — контейнеризация и оркестрация сервисов.
+  - [Docker](https://www.docker.com/) — контейнеризация.
 
 ## Запуск проекта
 
@@ -58,10 +58,6 @@
 4. **Настройка переменных окружения:**
    
    Отредактируйте файл `.env` с учётом своих данных:
-   # Пример содержимого .env файла
-   DATABASE_URL=postgresql+asyncpg://user:password@localhost/dbname
-   REDIS_URL=redis://localhost:6379
-   SECRET_KEY=your-secret-key-here
 
 5. **Применение миграций:**
    alembic upgrade head
@@ -71,7 +67,7 @@
 
 ### Вариант 2: Запуск с Docker
 
-**Требования:** Установленные Docker и Docker Compose.
+**Требования:** Установленные Docker.
 
 1. **Клонирование репозитория:**
    git clone --branch redis --single-branch https://github.com/ArtemAntoshchenko/BetterMe-project.git
