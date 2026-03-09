@@ -1,6 +1,6 @@
 FROM python:3.9
 
-LABEL owner='fgd196111@yandex.ru'
+LABEL owner='fgd19611@yandex.ru'
 
 ENV PYTHONONUNBUFFERED=1
 

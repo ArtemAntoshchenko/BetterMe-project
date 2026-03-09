@@ -5,7 +5,6 @@ from contextlib import asynccontextmanager
 from .core.redis import cache
 from .routers.auth import router as router_auth
 from .routers.dashboard import router as router_dashboard
-from .routers.dashboard import router as router_dashboard
 from .routers.habits import router as router_habits
 from .routers.tracking import router as router_tracking
 from .routers.profile import router as router_profile

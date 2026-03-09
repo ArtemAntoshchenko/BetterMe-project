@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     REDIS_DB: int
     REDIS_PASSWORD: str=''
     SUPERUSER_LOGIN: str
+    superuser_password: str = "admin123"
     SUPERUSER_EMAIL: str
     SUPERUSER_NICKNAME: str
     SUPERUSER_PHONE: str
