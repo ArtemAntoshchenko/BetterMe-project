@@ -93,8 +93,7 @@
 
 ## Структура проекта
 
-Вот как организован проект:
-
+```
 BetterMe/
 ├── alembic/              # Миграции базы данных
 ├── backend/
@@ -115,6 +114,7 @@ BetterMe/
 ├── LICENSE.md            # Лицензия MIT
 ├── README.md             # Документация проекта
 └── requirements.txt      # Зависимости проекта
+```
 
 <img width="248" height="674" alt="Структура проекта" src="https://github.com/user-attachments/assets/36a07b3a-02fc-4574-8f43-4293ac8d6839" />
 
