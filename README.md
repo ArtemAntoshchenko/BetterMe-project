@@ -138,7 +138,7 @@ BetterMe/
 └── requirements.txt      # Зависимости проекта
 ```
 
-<img width="248" height="674" alt="Структура проекта" src="https://github.com/user-attachments/assets/36a07b3a-02fc-4574-8f43-4293ac8d6839" />
+<img width="296" height="1038" alt="структура проекта" src="https://github.com/user-attachments/assets/269e4ea0-5638-4c41-930a-6df61de3ff0b" />
 
 ## Лицензия
 
