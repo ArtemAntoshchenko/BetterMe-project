@@ -5,13 +5,15 @@
 [![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Jinja](https://img.shields.io/badge/jinja-white.svg?style=for-the-badge&logo=jinja&logoColor=black)](https://jinja.palletsprojects.com/)
+[![Gunicorn](https://img.shields.io/badge/gunicorn-%298729.svg?style=for-the-badge&logo=gunicorn&logoColor=white)](https://gunicorn.org/)
+[![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)](https://nginx.org/)
 
 Учебный проект по созданию веб-сайта для закрепления полезных привычек **BetterMe**. Это мой первый большой REST API проект, построенный на современном асинхронном фреймворке FastAPI. Проект представляет собой полноценный сайт с возможностью регистрации, ведения списка привычек, отслеживания прогресса и получения достижений.
 
 ## Ключевые особенности
 
 - **🔐 Безопасность:** Аутентификация на основе JWT-токенов и надежное хеширование паролей с помощью bcrypt.
-- **⚡ Производительность:** Полностью асинхронное ядро приложения и кеширование данных в Redis для быстрого отклика.
+- **⚡ Производительность:** Полностью асинхронное ядро приложения и многоуровневое кэширование (Redis + Nginx + браузер) для быстрого отклика.
 - **📝 Работа с данными:** Валидация и сериализация данных осуществляется через Pydantic-схемы.
 - **📚 Документация:** Автоматически сгенерированная документация Swagger (OpenAPI) для всех эндпоинтов API.
 - **🌦️ Интеграция с внешним API:** Асинхронное подключение к погодному API с помощью библиотеки `aiohttp`.
@@ -25,12 +27,14 @@
   - [Pydantic v2](https://docs.pydantic.dev/) — валидация данных на основе аннотаций типов.
   - [Redis](https://redis.io/) — быстрое in-memory хранилище для кеширования.
   - [Alembic](https://alembic.sqlalchemy.org/) — инструмент для управления миграциями базы данных.
+- **Инфраструктура и DevOps**
+   - [Nginx](https://nginx.org/) — reverse proxy, раздача статики, балансировка нагрузки, WebSocket прокси.
+   - [Gunicorn](https://gunicorn.org/) + Uvicorn — ASGI сервер для production окружения.
+   - [Docker](https://www.docker.com/) — контейнеризация всего стека.
 - **Фронтенд:**
   - [Jinja2](https://jinja.palletsprojects.com/) — шаблонизатор для генерации HTML-страниц.
 - **База данных:**
   - [asyncpg (PostgreSQL)](https://github.com/MagicStack/asyncpg) — асинхронный драйвер для PostgreSQL.
-- **Инфраструктура:**
-  - [Docker](https://www.docker.com/) — контейнеризация.
 
 ## Запуск проекта
 
@@ -38,7 +42,7 @@
 
 ### Вариант 1: Локальная установка
 
-**Требования:** Установленные PostgreSQL и Redis на вашем устройстве.
+**Требования:** Установленные PostgreSQL, Redis и Nginx на вашем устройстве.
 
 1. **Клонирование репозитория:**
    git clone --branch main --single-branch https://github.com/ArtemAntoshchenko/BetterMe-project.git
@@ -65,6 +69,14 @@
 6. **Запуск сервера:**
    uvicorn backend.main:app --reload --port 8000
 
+7. **Запуск Nginx (в отдельном терминале):**
+   **Для Linux/macOS:**
+   sudo systemctl start nginx
+   
+   **Для Windows:**
+   cd C:\nginx
+   start nginx
+
 ### Вариант 2: Запуск с Docker
 
 **Требования:** Установленные Docker.
@@ -81,15 +93,22 @@
    Откройте браузер и перейдите по адресу:
    http://localhost:8000
 
+
 ## Документация API
 
 Структура проекта позволяет легко перемещаться по сайту через кнопки продвижения до регистрации, и через навигационное меню после регистрации и входа под своей учётной записью.
 
-### Доступные эндпоинты
+### Доступные эндпоинты 
 
-- http://127.0.0.1:8000 - приветственная страница
+- http://127.0.0.1:8000 - приветственная страница 
 - http://127.0.0.1:8000/auth/registration - страница регистрации
 - http://127.0.0.1:8000/docs - Swagger UI (документация API)
+
+### Доступные эндпоинты (через Nginx)
+
+- http://127.0.0.1:8080 - приветственная страница 
+- http://127.0.0.1:8080/auth/registration - страница регистрации
+- http://127.0.0.1:8080/docs - Swagger UI (документация API)
 
 ## Структура проекта
 
@@ -106,6 +125,9 @@ BetterMe/
 ├── frontend/
 │   ├── static/           # CSS, JS, изображения
 │   └── templates/        # HTML шаблоны
+├── deploy/               # Конфигурации для production
+│   ├── nginx/
+│   │   └── betterme.conf # Полная конфигурация Nginx
 ├── .env                  # Переменные окружения
 ├── .gitignore
 ├── alembic.ini
