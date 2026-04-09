@@ -125,6 +125,10 @@ BetterMe/
 ├── frontend/
 │   ├── static/           # CSS, JS, изображения
 │   └── templates/        # HTML шаблоны
+├── tests/
+│   ├── e2e/              # тесты пользовательских сценариев
+│   ├── integration/      # интеграционные тесты
+│   └── unit/             # unit тесты
 ├── deploy/               # Конфигурации для production
 │   ├── nginx/
 │   │   └── betterme.conf # Полная конфигурация Nginx
