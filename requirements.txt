@@ -9,3 +9,5 @@ python-jose
 bcrypt
 passlib[bcrypt]
 redis
+pytest-asyncio
+aiosqlite
