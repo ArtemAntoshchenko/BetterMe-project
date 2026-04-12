@@ -7,6 +7,9 @@ from typing import Annotated
 from datetime import date
 from typing import List
 from backend.DAO.dao_base import BaseDAO
+from backend.DAO.dao_habits import HabitDAO
+from backend.DAO.dao_achievement import AchievementDAO
+from backend.DAO.dao_registration import UserDAO
 from backend.db.database import get_db
 from contextlib import asynccontextmanager
 
@@ -102,16 +105,16 @@ class HabitCompletionTest(BaseTest):
     habit: Mapped[HabitTest]=relationship(back_populates='completions')
 
 
-class AchievementTestDAO(BaseDAO):
+class AchievementTestDAO(AchievementDAO):
     model=AchievementTest
 
-class UserTestDAO(BaseDAO):
+class UserTestDAO(UserDAO):
     model=UserTest
 
 class UserAchievementsTestDAO(BaseDAO):
     model=UserAchievementsTest
 
-class HabitTestDAO(BaseDAO):
+class HabitTestDAO(HabitDAO):
     model=HabitTest
 
 class TrackingTestDAO(BaseDAO):
@@ -191,3 +194,63 @@ async def two_users(db_session):
     )
     
     return user1, user2 
+
+@pytest.fixture(scope="function")
+async def sample_habit(db_session, user_id):
+    """Создаёт тестовую привычку"""
+    habit=await HabitTestDAO.add(
+        session=db_session,
+        user_id=user_id,
+        name="sample",
+        description="sample",
+        complit=False,
+        complit_today=False,
+        goal=100,
+        progress=20,
+        step=10
+    )
+    return habit
+
+
+@pytest.fixture(scope="function")
+async def two_habits(db_session):
+    """Создаёт user для тестовых привычек"""
+    user=await UserTestDAO.add(
+        session=db_session,
+        nickname="user",
+        login="login",
+        password="pass",
+        email="user@test.com",
+        phone_number="+2222222222",
+        first_name="First",
+        last_name="Last",
+        city="City",
+        date_of_birth=date(1990, 1, 1)
+    )
+    user_id=user.id
+
+    """Создаёт две тестовые привычки"""
+    habit1=await HabitTestDAO.add(
+        session=db_session,
+        user_id=user_id,
+        name="sample1",
+        description="sample1",
+        complit=False,
+        complit_today=False,
+        goal=100,
+        progress=20,
+        step=10
+    )
+    
+    habit2=await HabitTestDAO.add(
+        session=db_session,
+        user_id=user_id,
+        name="sample2",
+        description="sample2",
+        complit=False,
+        complit_today=False,
+        goal=110,
+        progress=30,
+        step=5
+    )
+    return habit1, habit2 

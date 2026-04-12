@@ -9,10 +9,14 @@ class HabitDAO(BaseDAO):
     model=Habit
 
     @classmethod
-    async def find_all(cls, profile_id):
-        async with get_db() as session:
+    async def find_all(cls, profile_id, session: AsyncSession=None):
+        if session:
             query=select(cls.model).where(cls.model.user_id==profile_id)
             result=await session.scalars(query)
+            return result.all()
+        async with get_db() as new_session:
+            query=select(cls.model).where(cls.model.user_id==profile_id)
+            result=await new_session.scalars(query)
             return result.all()
 
     @classmethod
@@ -28,19 +32,35 @@ class HabitDAO(BaseDAO):
                 return await _execute(new_session)
         
     @classmethod
-    async def complit_habit(cls, habit_id, user_id):
-        async with get_db() as session:
+    async def complit_habit(cls, habit_id, user_id, session: AsyncSession=None):
+        if session:
             query=select(cls.model).where(cls.model.id==habit_id, cls.model.user_id==user_id)
             habit=await session.scalar(query)
             habit.progress=min(habit.progress+habit.step, habit.goal)
             habit.complit_today=True
             return habit
+        async with get_db() as new_session:
+            query=select(cls.model).where(cls.model.id==habit_id, cls.model.user_id==user_id)
+            habit=await new_session.scalar(query)
+            habit.progress=min(habit.progress+habit.step, habit.goal)
+            habit.complit_today=True
+            return habit
         
     @classmethod
-    async def daily_habit_status_update(cls, habit_id):
-        async with get_db() as session:
+    async def daily_habit_status_update(cls, habit_id, session: AsyncSession=None):
+        if session:
             query=select(cls.model).where(cls.model.id==habit_id)
             habit=await session.scalar(query)
+            time_since_update=datetime.now()-habit.updated_at
+            if time_since_update>=timedelta(days=1):
+                habit.complit_today=False
+                habit.updated_at=datetime.now()
+                return 'Статус привычек был обновлен'
+            else:
+                return 'Еще не прошли сутки с последнего обновления'
+        async with get_db() as new_session:
+            query=select(cls.model).where(cls.model.id==habit_id)
+            habit=await new_session.scalar(query)
             time_since_update=datetime.now()-habit.updated_at
             if time_since_update>=timedelta(days=1):
                 habit.complit_today=False

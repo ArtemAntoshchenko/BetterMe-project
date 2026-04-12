@@ -1,10 +1,10 @@
 import pytest
-from datetime import date, datetime
+from datetime import date
 from sqlalchemy.exc import IntegrityError
-from tests.conftest import UserTestDAO, HabitTestDAO, UserTest
+from tests.conftest import UserTestDAO, HabitTestDAO
 
 class TestBaseDAO:
-    
+
     async def test_find_all_returns_all_records(self, db_session, two_users):
         """BaseDAO.find_all(): должен возвращать все записи"""
         user1, user2 = two_users
@@ -18,8 +18,6 @@ class TestBaseDAO:
     
     async def test_find_all_empty_table(self, db_session):
         """BaseDAO.find_all(): пустая таблица возвращает пустой список"""
-        # Очищаем таблицу
-        await UserTestDAO.delete(session=db_session, delete_all=True)
         
         result = await UserTestDAO.find_all(session=db_session)
         
@@ -211,7 +209,7 @@ class TestBaseDAO:
     async def test_delete_without_filters_raises_error(self, db_session):
         """BaseDAO.delete(): без фильтров вызывает ошибку"""
         with pytest.raises(ValueError, match="Необходимо указать хотя бы один параметр"):
-            await UserTestDAO.delete(session=db_session)  # ← добавил session
+            await UserTestDAO.delete(session=db_session)  
     
     async def test_delete_all_with_flag(self, db_session):
         """BaseDAO.delete(): delete_all=True удаляет все записи"""
@@ -297,5 +295,5 @@ class TestBaseDAO:
         )
         assert habit.id is not None
         
-        habits = await HabitTestDAO.find_all(session=db_session)  # ← добавил session
+        habits = await HabitTestDAO.find_all(session=db_session)
         assert len(habits) == 1
