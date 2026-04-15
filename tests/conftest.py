@@ -12,6 +12,7 @@ from backend.DAO.dao_achievement import AchievementDAO
 from backend.DAO.dao_registration import UserDAO
 from backend.db.database import get_db
 from contextlib import asynccontextmanager
+from sqlalchemy import func
 
 
 _engine = None
@@ -25,17 +26,21 @@ def get_engine():
         _sessionmaker = sessionmaker(_engine, class_=AsyncSession, expire_on_commit=False)
     return _engine, _sessionmaker
 
-
-class BaseTest(AsyncAttrs, DeclarativeBase):
-    __abstract__=True
-
+created_at=Annotated[datetime, mapped_column(server_default=func.now())]
+updated_at=Annotated[datetime, mapped_column(server_default=func.now(), onupdate=datetime.now)]
 int_pk=Annotated[int, mapped_column(primary_key=True)]
 str_uniq=Annotated[str, mapped_column(unique=True, nullable=False)]
 int_null_true=Annotated[int, mapped_column(nullable=True)]
 bool_False=Annotated[bool, mapped_column(default=False)]
 
+class BaseTest(AsyncAttrs, DeclarativeBase):
+    __abstract__ = True
+
+    created_at: Mapped[created_at]
+    updated_at: Mapped[updated_at]
+
 class UserTest(BaseTest):
-    __tablename__= 'test_users'
+    __tablename__ = 'test_users'
 
     id: Mapped[int_pk]
     nickname: Mapped[str_uniq]
@@ -196,7 +201,21 @@ async def two_users(db_session):
     return user1, user2 
 
 @pytest.fixture(scope="function")
-async def sample_habit(db_session, user_id):
+async def sample_habit(db_session):
+    """Создаёт user для тестовой привычки"""
+    user=await UserTestDAO.add(
+        session=db_session,
+        nickname="user",
+        login="login",
+        password="pass",
+        email="user@test.com",
+        phone_number="+2222222222",
+        first_name="First",
+        last_name="Last",
+        city="City",
+        date_of_birth=date(1990, 1, 1)
+    )
+    user_id=user.id
     """Создаёт тестовую привычку"""
     habit=await HabitTestDAO.add(
         session=db_session,
