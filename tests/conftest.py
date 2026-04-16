@@ -205,15 +205,15 @@ async def sample_habit(db_session):
     """Создаёт user для тестовой привычки"""
     user=await UserTestDAO.add(
         session=db_session,
-        nickname="user",
-        login="login",
-        password="pass",
-        email="user@test.com",
-        phone_number="+2222222222",
-        first_name="First",
-        last_name="Last",
-        city="City",
-        date_of_birth=date(1990, 1, 1)
+        nickname="users",
+        login="logins",
+        password="passs",
+        email="users@test.com",
+        phone_number="+1222222221",
+        first_name="Firsts",
+        last_name="Lasts",
+        city="Citys",
+        date_of_birth=date(1991, 1, 1)
     )
     user_id=user.id
     """Создаёт тестовую привычку"""

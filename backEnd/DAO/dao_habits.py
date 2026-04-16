@@ -36,15 +36,23 @@ class HabitDAO(BaseDAO):
         if session:
             query=select(cls.model).where(cls.model.id==habit_id, cls.model.user_id==user_id)
             habit=await session.scalar(query)
-            habit.progress=min(habit.progress+habit.step, habit.goal)
-            habit.complit_today=True
-            return habit
+            if habit.complit_today==False:
+                habit.progress=min(habit.progress+habit.step, habit.goal)
+                habit.complit_today=True
+                await session.flush()
+                return habit
+            else:
+                return habit
         async with get_db() as new_session:
             query=select(cls.model).where(cls.model.id==habit_id, cls.model.user_id==user_id)
             habit=await new_session.scalar(query)
-            habit.progress=min(habit.progress+habit.step, habit.goal)
-            habit.complit_today=True
-            return habit
+            if habit.complit_today==False:
+                habit.progress=min(habit.progress+habit.step, habit.goal)
+                habit.complit_today=True
+                await new_session.flush()
+                return habit
+            else:
+                return habit
         
     @classmethod
     async def daily_habit_status_update(cls, habit_id, session: AsyncSession=None):
@@ -55,6 +63,7 @@ class HabitDAO(BaseDAO):
             if time_since_update>=timedelta(days=1):
                 habit.complit_today=False
                 habit.updated_at=datetime.now()
+                await session.flush()
                 return 'Статус привычек был обновлен'
             else:
                 return 'Еще не прошли сутки с последнего обновления'
@@ -65,6 +74,7 @@ class HabitDAO(BaseDAO):
             if time_since_update>=timedelta(days=1):
                 habit.complit_today=False
                 habit.updated_at=datetime.now()
+                await new_session.flush()
                 return 'Статус привычек был обновлен'
             else:
                 return 'Еще не прошли сутки с последнего обновления'
