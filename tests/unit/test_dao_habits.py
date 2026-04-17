@@ -1,6 +1,5 @@
 import pytest
 from datetime import date, datetime, timedelta
-from sqlalchemy.exc import IntegrityError
 from tests.conftest import UserTestDAO, HabitTestDAO
 
 class TestHabitsDAO:
@@ -77,21 +76,9 @@ class TestHabitsDAO:
         assert habit1.id in [h.id for h in result]
         assert habit2.id not in [h.id for h in result]
 
-    async def test_find_all_with_nonexistent_user(self, db_session):
+    async def test_find_all_with_nonexistent_user(self, db_session, sample_user):
         """HabitsDAO.find_all(): при запросе несуществующего пользователя возвращает пустой список"""
-        user=await UserTestDAO.add(
-            session=db_session,
-            nickname="user",
-            login="login",
-            password="pass",
-            email="user@test.com",
-            phone_number="+2222222222",
-            first_name="First",
-            last_name="Last",
-            city="City",
-            date_of_birth=date(1990, 1, 1)
-        )
-        user_id=user.id
+        user_id=sample_user.id
         habit=await HabitTestDAO.add(
             session=db_session,
             user_id=user_id,
@@ -107,21 +94,9 @@ class TestHabitsDAO:
         assert isinstance(result, list)
         assert result==[]
 
-    async def test_find_all_active_return_all(self, db_session):
+    async def test_find_all_active_return_all(self, db_session, sample_user):
         """HabitsDAO.find_all_active(): должен возвращать все активные записи"""
-        user=await UserTestDAO.add(
-            session=db_session,
-            nickname="user",
-            login="login",
-            password="pass",
-            email="user@test.com",
-            phone_number="+2222222222",
-            first_name="First",
-            last_name="Last",
-            city="City",
-            date_of_birth=date(1990, 1, 1)
-        )
-        user_id=user.id
+        user_id=sample_user.id
         habit1=await HabitTestDAO.add(
             session=db_session,
             user_id=user_id,
@@ -213,21 +188,9 @@ class TestHabitsDAO:
         assert habit1.id in [h.id for h in result]
         assert habit2.id not in [h.id for h in result]
 
-    async def test_find_all_active_with_nonexistent_user(self, db_session):
+    async def test_find_all_active_with_nonexistent_user(self, db_session, sample_user):
         """HabitsDAO.find_all_active(): при запросе несуществующего пользователя возвращает пустой список"""
-        user=await UserTestDAO.add(
-            session=db_session,
-            nickname="user",
-            login="login",
-            password="pass",
-            email="user@test.com",
-            phone_number="+2222222222",
-            first_name="First",
-            last_name="Last",
-            city="City",
-            date_of_birth=date(1990, 1, 1)
-        )
-        user_id=user.id
+        user_id=sample_user.id
         habit=await HabitTestDAO.add(
             session=db_session,
             user_id=user_id,
@@ -244,21 +207,9 @@ class TestHabitsDAO:
         assert result==[]
 
 
-    async def test_complit_habit_change_status_correct(self, db_session):
+    async def test_complit_habit_change_status_correct(self, db_session, sample_user):
         """HabitsDAO.complite_habit(): правильно меняет статус привычки"""
-        user=await UserTestDAO.add(
-            session=db_session,
-            nickname="user",
-            login="login",
-            password="pass",
-            email="user@test.com",
-            phone_number="+2222222222",
-            first_name="First",
-            last_name="Last",
-            city="City",
-            date_of_birth=date(1990, 1, 1)
-        )
-        user_id=user.id
+        user_id=sample_user.id
         habit=await HabitTestDAO.add(
             session=db_session,
             user_id=user_id,
@@ -274,21 +225,9 @@ class TestHabitsDAO:
         assert habit.complit_today==True
         assert habit.progress==30
 
-    async def test_complit_habit_already_completed_today(self, db_session):
+    async def test_complit_habit_already_completed_today(self, db_session, sample_user):
         """HabitsDAO.complite_habit(): повторное выполнение в тот же день не должно увеличивать прогресс"""
-        user=await UserTestDAO.add(
-            session=db_session,
-            nickname="user",
-            login="login",
-            password="pass",
-            email="user@test.com",
-            phone_number="+2222222222",
-            first_name="First",
-            last_name="Last",
-            city="City",
-            date_of_birth=date(1990, 1, 1)
-        )
-        user_id=user.id
+        user_id=sample_user.id
         habit=await HabitTestDAO.add(
             session=db_session,
             user_id=user_id,
@@ -304,28 +243,16 @@ class TestHabitsDAO:
         assert habit.complit_today==True
         assert habit.progress==20
 
-    async def test_complit_habit_reaches_goal(self, db_session):
+    async def test_complit_habit_reaches_goal(self, db_session, sample_user):
         """HabitsDAO.complite_habit(): при достижении цели прогресс не превышает goal"""
-        user=await UserTestDAO.add(
-            session=db_session,
-            nickname="user",
-            login="login",
-            password="pass",
-            email="user@test.com",
-            phone_number="+2222222222",
-            first_name="First",
-            last_name="Last",
-            city="City",
-            date_of_birth=date(1990, 1, 1)
-        )
-        user_id=user.id
+        user_id=sample_user.id
         habit=await HabitTestDAO.add(
             session=db_session,
             user_id=user_id,
             name="sample1",
             description="sample1",
             complit=False,
-            complit_today=True,
+            complit_today=False,
             goal=100,
             progress=95,
             step=10,
@@ -379,25 +306,15 @@ class TestHabitsDAO:
             step=10
         )
         result=await HabitTestDAO.complit_habit(session=db_session, habit_id=habit.id, user_id=user2.id)
+        await db_session.refresh(habit)
         assert result is None
         assert habit.progress==20
 
 
-    async def test_daily_habit_status_update_change_status_correct(self, db_session):
+    async def test_daily_habit_status_update_change_status_correct(self, db_session, sample_user):
         """HabitsDAO.daily_habit_status_update(): правильно меняет статус привычки"""
-        user=await UserTestDAO.add(
-            session=db_session,
-            nickname="user",
-            login="login",
-            password="pass",
-            email="user@test.com",
-            phone_number="+2222222222",
-            first_name="First",
-            last_name="Last",
-            city="City",
-            date_of_birth=date(1990, 1, 1)
-        )
-        user_id=user.id
+        sample_user
+        user_id=sample_user.id
         old_date=datetime.now()-timedelta(days=2)
         habit=await HabitTestDAO.add(
             session=db_session,

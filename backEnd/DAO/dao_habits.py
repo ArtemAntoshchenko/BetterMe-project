@@ -36,6 +36,8 @@ class HabitDAO(BaseDAO):
         if session:
             query=select(cls.model).where(cls.model.id==habit_id, cls.model.user_id==user_id)
             habit=await session.scalar(query)
+            if habit is None:
+                return None
             if habit.complit_today==False:
                 habit.progress=min(habit.progress+habit.step, habit.goal)
                 habit.complit_today=True
@@ -46,6 +48,8 @@ class HabitDAO(BaseDAO):
         async with get_db() as new_session:
             query=select(cls.model).where(cls.model.id==habit_id, cls.model.user_id==user_id)
             habit=await new_session.scalar(query)
+            if habit is None:
+                return None
             if habit.complit_today==False:
                 habit.progress=min(habit.progress+habit.step, habit.goal)
                 habit.complit_today=True
@@ -59,6 +63,8 @@ class HabitDAO(BaseDAO):
         if session:
             query=select(cls.model).where(cls.model.id==habit_id)
             habit=await session.scalar(query)
+            if habit is None:
+                return None
             time_since_update=datetime.now()-habit.updated_at
             if time_since_update>=timedelta(days=1):
                 habit.complit_today=False
@@ -70,6 +76,8 @@ class HabitDAO(BaseDAO):
         async with get_db() as new_session:
             query=select(cls.model).where(cls.model.id==habit_id)
             habit=await new_session.scalar(query)
+            if habit is None:
+                return None
             time_since_update=datetime.now()-habit.updated_at
             if time_since_update>=timedelta(days=1):
                 habit.complit_today=False
