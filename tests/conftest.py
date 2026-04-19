@@ -6,10 +6,11 @@ from datetime import datetime
 from typing import Annotated
 from datetime import date
 from typing import List
-from backend.DAO.dao_base import BaseDAO
 from backend.DAO.dao_habits import HabitDAO
 from backend.DAO.dao_achievement import AchievementDAO
 from backend.DAO.dao_registration import UserDAO
+from backend.DAO.dao_user_achievements import UserAchievementsDAO
+from backend.DAO.dao_tracking import TrackingDAO
 from backend.db.database import get_db
 from contextlib import asynccontextmanager
 from sqlalchemy import func
@@ -116,13 +117,13 @@ class AchievementTestDAO(AchievementDAO):
 class UserTestDAO(UserDAO):
     model=UserTest
 
-class UserAchievementsTestDAO(BaseDAO):
+class UserAchievementsTestDAO(UserAchievementsDAO):
     model=UserAchievementsTest
 
 class HabitTestDAO(HabitDAO):
     model=HabitTest
 
-class TrackingTestDAO(BaseDAO):
+class TrackingTestDAO(TrackingDAO):
     model=HabitCompletionTest
 
 
@@ -272,4 +273,36 @@ async def two_habits(db_session):
         progress=30,
         step=5
     )
-    return habit1, habit2 
+    return habit1, habit2
+
+
+@pytest.fixture(scope="function")
+async def sample_user_achievement(db_session):
+    """Создаёт пользователя"""
+    user=await UserTestDAO.add(
+        session=db_session,
+        nickname="user",
+        login="login",
+        password="pass",
+        email="user@test.com",
+        phone_number="+2222222222",
+        first_name="First",
+        last_name="Last",
+        city="City",
+        date_of_birth=date(1990, 1, 1)
+    )
+    """Создаёт тестовое достижение"""
+    achievement=await AchievementTestDAO.add(
+        session=db_session,
+        name="sample",
+        description="sample",
+        type="sampleType",
+        goal=10
+    )
+    """Создаёт связь между пользователем и достижением"""
+    userAchievements=await UserAchievementsTestDAO.add(
+        session=db_session,
+        user_id=user.id,
+        achievement_id=achievement.id
+    )
+    return achievement, user
