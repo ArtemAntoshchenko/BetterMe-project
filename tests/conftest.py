@@ -126,6 +126,42 @@ class HabitTestDAO(HabitDAO):
 class TrackingTestDAO(TrackingDAO):
     model=HabitCompletionTest
 
+    @classmethod
+    async def get_all_habits_heatmap_data(cls, session: AsyncSession, user_id: int, days: int=90)-> List[dict]:
+        if session:
+            habits=await HabitTestDAO.find_all_active(session=session, profile_id=user_id)
+            result=[]
+            for habit in habits:
+                heatmap_data=await cls.get_heatmap_data(habit.id, days, session=session)
+                stats=await cls.get_heatmap_stats(habit.id, days, session=session)
+                hue=(habit.id * 137)%360
+                result.append({
+                    'habit_id': habit.id,
+                    'habit_name': habit.name,
+                    'color': f"hsl({hue}, 70%, 50%)",
+                    'heatmap_data': heatmap_data,
+                    'current_streak': stats['current_streak'],
+                    'total_completions': stats['total_completions']
+                })
+            return result
+        else:
+            async with get_db() as new_session:
+                habits=await HabitTestDAO.find_all_active(session=new_session, profile_id=user_id)
+                result=[]
+                for habit in habits:
+                    heatmap_data=await cls.get_heatmap_data(habit.id, days, session=new_session)
+                    stats=await cls.get_heatmap_stats(habit.id, days, session=new_session)
+                    hue=(habit.id * 137)%360
+                    result.append({
+                        'habit_id': habit.id,
+                        'habit_name': habit.name,
+                        'color': f"hsl({hue}, 70%, 50%)",
+                        'heatmap_data': heatmap_data,
+                        'current_streak': stats['current_streak'],
+                        'total_completions': stats['total_completions']
+                    })
+                return result
+
 
 @pytest.fixture(scope="function", autouse=True)
 async def setup_database():

@@ -1,6 +1,6 @@
 import pytest
 from datetime import date, timedelta
-from tests.conftest import TrackingTestDAO
+from tests.conftest import TrackingTestDAO, HabitTestDAO
 
 class TestTrackingDAO:
 
@@ -83,6 +83,66 @@ class TestTrackingDAO:
         assert result['completion_rate']==0
         assert result['current_streak']==0
         assert result['longest_streak']==0
+
+
+    async def test_get_all_habits_heatmap_data_returns_list(self, db_session, sample_user):
+        """TrackingDAO.get_all_habits_heatmap_data(): должен возвращать список данных для всех привычек"""
+        habits=[]
+        for i in range(3):
+            habit=await HabitTestDAO.add(
+                session=db_session,
+                user_id=sample_user.id,
+                name=f"Habit {i}",
+                description=f"Test {i}",
+                complit=False,
+                complit_today=False,
+                goal=100,
+                progress=0,
+                step=10
+            )
+            habits.append(habit)
+            await TrackingTestDAO.create_completion(session=db_session, user_id=sample_user.id, habit_id=habit.id)
+        result=await TrackingTestDAO.get_all_habits_heatmap_data(session=db_session, user_id=sample_user.id, days=30)
+        assert isinstance(result, list)
+        assert len(result)==3
+        for habit_data in result:
+            assert 'habit_id' in habit_data
+            assert 'habit_name' in habit_data
+            assert 'color' in habit_data
+            assert 'heatmap_data' in habit_data
+            assert 'current_streak' in habit_data
+            assert 'total_completions' in habit_data
+            assert isinstance(habit_data['heatmap_data'], dict)
+    
+    async def test_get_all_habits_heatmap_data_without_habits(self, db_session, sample_user):
+        """TrackingDAO.get_all_habits_heatmap_data(): должен возвращать пустой список для пользователя без привычек"""
+        result=await TrackingTestDAO.get_all_habits_heatmap_data(session=db_session, user_id=sample_user.id, days=30)
+        assert isinstance(result, list)
+        assert len(result)==0
+
+    async def test_get_all_habits_heatmap_data_returns_valid_colors(self, db_session, sample_user):
+        """TrackingDAO.get_all_habits_heatmap_data(): должен возвращать валидные HSL цвета"""
+        habit=await HabitTestDAO.add(
+            session=db_session,
+            user_id=sample_user.id,
+            name="Color Habit",
+            description="Test",
+            complit=False,
+            complit_today=False,
+            goal=100,
+            progress=0,
+            step=10
+        )
+        await TrackingTestDAO.create_completion(session=db_session, user_id=sample_user.id, habit_id=habit.id)
+        result=await TrackingTestDAO.get_all_habits_heatmap_data(session=db_session, user_id=sample_user.id)
+        assert len(result)==1
+        color=result[0]['color']
+        assert color.startswith('hsl(')
+        assert color.endswith(')')
+        parts=color[4:-1].split(',')
+        assert len(parts)==3
+
+
 
 
 
