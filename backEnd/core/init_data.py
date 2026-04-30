@@ -13,7 +13,8 @@ import os
 async def init_superuser():
     result=await UserDAO.find_superuser()
     if result:
-        print(f"Суперпользователь уже существует: {result.nickname} ({result.login})")
+        for s in result:
+            print(f"Суперпользователь уже существует: {s.nickname} ({s.login})")
         return
     print("="*30)
     print("СОЗДАНИЕ ПЕРВОГО СУПЕРПОЛЬЗОВАТЕЛЯ")
