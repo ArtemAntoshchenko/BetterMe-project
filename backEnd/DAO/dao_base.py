@@ -87,10 +87,18 @@ class BaseDAO():
         if not delete_all and not filter_by:
             raise ValueError("Необходимо указать хотя бы один параметр для удаления!")
         if session: 
-            query=delete(cls.model).filter_by(**filter_by)
+            query=select(cls.model).filter_by(**filter_by)
             result=await session.execute(query)
-            return result.rowcount
+            objects=result.scalars().all()
+            for obj in objects:
+                await session.delete(obj)
+            await session.flush()
+            return len(objects)
         async with get_db() as new_session:
-            query=delete(cls.model).filter_by(**filter_by)
+            query=select(cls.model).filter_by(**filter_by)
             result=await new_session.execute(query)
-            return result.rowcount
+            objects=result.scalars().all()
+            for obj in objects:
+                await new_session.delete(obj)
+            await new_session.flush()
+            return len(objects)
