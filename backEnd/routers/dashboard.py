@@ -38,7 +38,17 @@ async def dashBoard(request: Request, profile=Depends(getUserInfo)):
                     'icon': forecast['weather'][0]['icon']
                 }
                 forecasts.append(weather)
-    city_weather=forecasts[4]
+    if len(forecasts)>=5:
+        city_weather=forecasts[4]
+    elif len(forecasts)>0:
+        city_weather=forecasts[-1]
+    else:
+        city_weather={
+            'datetime': tomorrow.isoformat(),
+            'temperature': 20,
+            'description': 'Прогноз временно недоступен',
+            'icon': '03d'
+        }
     context={
         'request': request,
         'js_url': '/static/js',
@@ -47,7 +57,7 @@ async def dashBoard(request: Request, profile=Depends(getUserInfo)):
         'profile': profile,
         'is_superuser': profile.super_user
     }
-    return templates.TemplateResponse('dashboard.html', context)
+    return templates.TemplateResponse(request, 'dashboard.html', context)
 
 @router.get('/main/getActiveHabits')
 async def getActiveHabits(profile=Depends(getUserInfo)):
@@ -56,7 +66,7 @@ async def getActiveHabits(profile=Depends(getUserInfo)):
     if cached is not None:
         print('Информация взята из кэша')
         return cached
-    result=await HabitDAO.find_all_active(profile.id)
+    result=await HabitDAO.find_all_active(profile_id=profile.id)
     habits_list=[{
         'id': habit.id,
         'name': habit.name,

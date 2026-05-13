@@ -1,11 +1,13 @@
 import pytest
+import pytest_asyncio
+import asyncio
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncAttrs, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column, relationship, sessionmaker
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, UniqueConstraint
 from datetime import datetime
 from typing import Annotated
 from datetime import date
-from typing import List
+from typing import List, AsyncGenerator, Dict, Any
 from backend.DAO.dao_habits import HabitDAO
 from backend.DAO.dao_achievement import AchievementDAO
 from backend.DAO.dao_registration import UserDAO
@@ -14,16 +16,33 @@ from backend.DAO.dao_tracking import TrackingDAO
 from backend.db.database import get_db
 from contextlib import asynccontextmanager
 from sqlalchemy import func
+import os
+import tempfile
+from httpx import AsyncClient
 
+
+TEST_TYPE = os.getenv("TEST_TYPE", "integration")
+
+def get_test_db_url():
+    if TEST_TYPE == "e2e":
+        temp_db = tempfile.NamedTemporaryFile(delete=False, suffix='.db')
+        temp_db.close()
+        return f"sqlite+aiosqlite:///{temp_db.name}"
+    else:
+        return "sqlite+aiosqlite:///:memory:"
 
 _engine = None
 _sessionmaker = None
+_test_db_file = None
 
 def get_engine():
-    """Создаёт движок один раз"""
-    global _engine, _sessionmaker
+    """Создаёт движок один раз с учётом типа тестов"""
+    global _engine, _sessionmaker, _test_db_file
     if _engine is None:
-        _engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+        db_url=get_test_db_url()
+        if db_url.startswith("sqlite+aiosqlite:///") and db_url != "sqlite+aiosqlite:///:memory:":
+            _test_db_file = db_url.replace("sqlite+aiosqlite:///", "")
+        _engine = create_async_engine(db_url, echo=False)
         _sessionmaker = sessionmaker(_engine, class_=AsyncSession, expire_on_commit=False)
     return _engine, _sessionmaker
 
@@ -168,13 +187,11 @@ async def setup_database():
     """Автоматически создаёт и чистит таблицы для каждого теста"""
     engine, _ = get_engine()
     
-    # Создаём таблицы
     async with engine.begin() as conn:
         await conn.run_sync(BaseTest.metadata.create_all)
     
     yield
     
-    # Чистим таблицы после теста
     async with engine.begin() as conn:
         await conn.run_sync(BaseTest.metadata.drop_all)
 
@@ -182,10 +199,14 @@ async def setup_database():
 @pytest.fixture(scope="function")
 async def db_session():
     """Возвращает сессию для тестов"""
+    global TEST_TYPE
+    old_type = TEST_TYPE
+    os.environ["TEST_TYPE"] = "integration"
     _, sessionmaker = get_engine()
     async with sessionmaker() as session:
         async with session.begin():
             yield session
+    os.environ["TEST_TYPE"] = old_type
 
 
 @pytest.fixture(scope="function")
@@ -342,3 +363,149 @@ async def sample_user_achievement(db_session):
         achievement_id=achievement.id
     )
     return achievement, user
+
+
+@pytest.fixture(scope='function')
+async def live_server():
+    """Запускает реальное FastAPI приложение для E2E тестов"""
+    import uvicorn
+    from backend.main import app
+    import httpx
+    
+    app.state.testing = True
+    app.state.e2e_testing = True
+    os.environ['TESTING'] = 'true'
+    os.environ['E2E_TESTING'] = 'true'
+    os.environ['TEST_DB_URL'] = get_test_db_url()
+    
+    config = uvicorn.Config(app, host='127.0.0.1', port=8888, log_level='error', loop='asyncio')
+    server = uvicorn.Server(config)
+    task = asyncio.create_task(server.serve())
+    
+    # Увеличиваем время ожидания запуска сервера
+    await asyncio.sleep(3)
+    
+    # Проверяем, что сервер действительно запустился
+    async with httpx.AsyncClient() as client:
+        for i in range(15):  # Увеличил количество попыток
+            try:
+                await client.get("http://127.0.0.1:8888")
+                break
+            except:
+                await asyncio.sleep(1)
+        else:
+            raise RuntimeError("Сервер не запустился после 15 попыток")
+    
+    yield "http://127.0.0.1:8888"
+    
+    server.should_exit = True
+    await task
+    
+    if _test_db_file and os.path.exists(_test_db_file):
+        try:
+            os.unlink(_test_db_file)
+        except:
+            pass
+
+@pytest.fixture(scope="function")
+async def e2e_client(live_server):
+    """HTTP клиент для прямых API вызовов в E2E тестах"""
+    # Добавляем небольшую задержку перед созданием клиента
+    await asyncio.sleep(0.5)
+    async with AsyncClient(base_url=live_server, timeout=30.0) as client:  # Увеличил таймаут
+        yield client
+
+@pytest.fixture(scope="function")
+async def authenticated_user_e2e(e2e_client, live_server):
+    """Создаёт авторизованного пользователя через API для E2E тестов"""
+    import time
+    
+    # Небольшая задержка
+    await asyncio.sleep(0.5)
+    
+    timestamp = int(time.time())
+    short_timestamp = str(timestamp)[-5:]
+    
+    user_data = {
+        "nickname": f"e2e_user_{short_timestamp}",
+        "login": f"e2e_login_{short_timestamp}",
+        "password": "TestPass123",
+        "email": f"e2e_{short_timestamp}@test.com",
+        "phone_number": f"+7{short_timestamp}12345",  # Исправлен формат
+        "first_name": "E2E",
+        "last_name": "User",
+        "city": "Test City",
+        "date_of_birth": "1990-01-01"
+    }
+    
+    # Регистрация через API
+    response = await e2e_client.post("/auth/registration", json=user_data)
+    assert response.status_code == 200, f"Registration failed: {response.text}"
+    
+    # Вход через API
+    response = await e2e_client.post("/auth/login", json={
+        "login": user_data["login"],
+        "password": user_data["password"]
+    })
+    assert response.status_code == 200, f"Login failed: {response.text}"
+    
+    token = response.json()['access_token']
+    user_data['token'] = token
+    return user_data
+
+@pytest.fixture(scope="function")
+async def browser_context():
+    """Создаёт контекст браузера для E2E тестов"""
+    from playwright.async_api import async_playwright
+    playwright=await async_playwright().start()
+    headless=os.getenv('HEADLESS', 'true').lower()=='true'
+    browser=await playwright.chromium.launch(
+        headless=headless,
+        args=['--disable-dev-shm-usage']
+    )
+    context=await browser.new_context(
+        viewport={'width':1920, 'height':1080},
+        locale='ru-Ru'
+    )
+    yield context
+    await context.close()
+    await browser.close()
+    await playwright.stop()
+
+@pytest.fixture
+async def page(browser_context):
+    """Создаёт новую страницу для E2E тестов"""
+    page=await browser_context.new_page()
+    try:
+        yield page
+    except:
+        screenshot=await page.screenshot()
+        with open(f'e2e_error_{asyncio.get_event_loop().time()}.png", "wb"') as f:
+            f.write(screenshot)
+        raise
+
+@pytest.fixture
+async def e2e_habit(e2e_client, authenticated_user_e2e):
+    """Создаёт привычку через API для E2E тестов"""
+    import time
+    e2e_client.cookies.set('users_access_token', authenticated_user_e2e['token'])
+    habit_data={
+        "name":f"E2E Habit {int(time.time())}",
+        "description":"Test habit for E2E",
+        "goal":100,
+        "step":10
+    }
+    response=await e2e_client.post('/habits/main/createNewHabit', json=habit_data)
+    assert response.status_code==200
+    return {**habit_data, 'id':None}
+
+@pytest.fixture(scope="function", autouse=True)
+def cleanup_e2e_files():
+    """Очищает временные файлы после всех тестов"""
+    yield
+    global _test_db_file
+    if _test_db_file and os.path.exists(_test_db_file):
+        try:
+            os.unlink(_test_db_file)
+        except:
+            pass

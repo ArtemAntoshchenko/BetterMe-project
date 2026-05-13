@@ -10,4 +10,5 @@ bcrypt
 passlib[bcrypt]
 redis
 pytest-asyncio
+playwright
 aiosqlite

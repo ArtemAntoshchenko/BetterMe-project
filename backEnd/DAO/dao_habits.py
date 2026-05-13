@@ -20,7 +20,7 @@ class HabitDAO(BaseDAO):
             return result.all()
 
     @classmethod
-    async def find_all_active(cls, profile_id, session: AsyncSession=None):
+    async def find_all_active(cls, session: AsyncSession=None, profile_id=None):
         async def _execute(alt_session):
             query=select(cls.model).where(cls.model.complit==False, cls.model.user_id==profile_id)
             result=await alt_session.scalars(query)

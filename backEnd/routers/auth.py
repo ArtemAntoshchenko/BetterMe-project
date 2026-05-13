@@ -16,7 +16,7 @@ templates=Jinja2Templates(directory=html_path)
 
 @router.get('/login')
 async def login(request: Request):
-    return templates.TemplateResponse(name='login.html', context={'request': request, "js_url": "/static/js", "css_url": "/static/css"})
+    return templates.TemplateResponse(request, name='login.html', context={'request': request, "js_url": "/static/js", "css_url": "/static/css"})
 
 @router.post('/login')
 async def loginUser(response: Response, user_data: UserAuthSchema):
@@ -35,7 +35,7 @@ async def logoutUser(response: Response):
 
 @router.get('/registration')
 async def register(request: Request):
-    return templates.TemplateResponse(name='registration.html', context={'request': request, "js_url": "/static/js", "css_url": "/static/css"})
+    return templates.TemplateResponse(request, name='registration.html', context={'request': request, "js_url": "/static/js", "css_url": "/static/css"})
 
 @router.post('/registration')
 async def registerUser(user_data: UserRegisterSchema)-> dict:

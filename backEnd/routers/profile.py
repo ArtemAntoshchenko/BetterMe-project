@@ -28,7 +28,7 @@ async def profile(request: Request, profile=Depends(getUserInfo)):
         'css_url': '/static/css',
         'profile': profile
     }
-    return templates.TemplateResponse('profile.html', context)
+    return templates.TemplateResponse(request, 'profile.html', context)
 
 @router.get('/main/{profileId}/info')
 async def profileInfo(profileId: int):

@@ -24,7 +24,7 @@ async def habits(request: Request, profile=Depends(getUserInfo)):
         "css_url": "/static/css",
         "profile": profile
     }
-    return templates.TemplateResponse('habits.html', context)
+    return templates.TemplateResponse(request, 'habits.html', context)
 
 @router.get('/main/getHabits')
 async def getHabits(profile=Depends(getUserInfo))-> list[HabitSchema]:
@@ -48,7 +48,7 @@ async def getActiveHabits(profile=Depends(getUserInfo))-> list[HabitSchema]:
 
 @router.get('/main/createNewHabit')
 async def createNewHabit(request: Request):
-    return templates.TemplateResponse(name='new_habit.html', context={'request': request, "js_url": "/static/js", "css_url": "/static/css"})
+    return templates.TemplateResponse(request, name='new_habit.html', context={'request': request, "js_url": "/static/js", "css_url": "/static/css"})
 
 @router.post('/main/createNewHabit')
 async def createNewHabit(habit_data: HabitCreateSchema, profile=Depends(getUserInfo))-> dict:

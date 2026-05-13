@@ -11,7 +11,7 @@ import asyncio
 import os
 
 async def init_superuser():
-    result=await UserDAO.find_superuser()
+    result=await UserDAO.find_superusers()
     if result:
         for s in result:
             print(f"Суперпользователь уже существует: {s.nickname} ({s.login})")

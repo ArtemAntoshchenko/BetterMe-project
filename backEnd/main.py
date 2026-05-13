@@ -30,8 +30,8 @@ templates=Jinja2Templates(directory=html_path)
 if os.path.exists(public_dir):
     app.mount('/public', StaticFiles(directory=public_dir), name='public')
 
-# if os.path.exists(static_dir):
-#     app.mount('/static', StaticFiles(directory=static_dir), name='static')
+if os.path.exists(static_dir):
+    app.mount('/static', StaticFiles(directory=static_dir), name='static')
 
 app.include_router(router_auth)
 app.include_router(router_dashboard)
@@ -42,6 +42,6 @@ app.include_router(router_admin)
 
 @app.get('/')
 async def landing_page(request: Request):
-    return templates.TemplateResponse('index.html', context={"request": request,"css_url": "/static/css"})
+    return templates.TemplateResponse(request, 'index.html', context={"request": request,"css_url": "/static/css"})
 
 

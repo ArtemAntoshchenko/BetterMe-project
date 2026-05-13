@@ -27,7 +27,7 @@ async def profile(request: Request):
         'js_url': '/static/js',
         'css_url': '/static/css'
     }
-    return templates.TemplateResponse('admin.html', context)
+    return templates.TemplateResponse(request, 'admin.html', context)
 
 @router.get('/main/info')
 async def profilesInfo():
