@@ -365,6 +365,24 @@ async def sample_user_achievement(db_session):
     return achievement, user
 
 
+@pytest.fixture(scope='function', autouse=True)
+def switch_to_test_models():
+    """Временно подменяет модели в оригинальных DAO на тестовые"""
+    if os.environ.get('E2E_TESTING') == 'true':
+        from backend.DAO.dao_habits import HabitDAO
+
+        # Сохраняем оригинальные модели
+        original_habit_model = HabitDAO.model
+
+        # Подменяем на тестовые
+        HabitDAO.model = HabitTest
+        yield
+        
+        # Восстанавливаем
+        HabitDAO.model = original_habit_model
+    else:
+        yield
+
 @pytest.fixture(scope='function')
 async def live_server():
     """Запускает реальное FastAPI приложение для E2E тестов"""
@@ -431,7 +449,7 @@ async def authenticated_user_e2e(e2e_client, live_server):
         "login": f"e2e_login_{short_timestamp}",
         "password": "TestPass123",
         "email": f"e2e_{short_timestamp}@test.com",
-        "phone_number": f"+7{short_timestamp}12345",  # Исправлен формат
+        "phone_number": f"+7{short_timestamp}12345",
         "first_name": "E2E",
         "last_name": "User",
         "city": "Test City",

@@ -23,15 +23,22 @@ class TestBetterMeE2E:
         
         # Переходим на страницу привычек
         await page.goto(f'{live_server}/habits/main')
-        await expect(page.locator('h1')).to_contain_text('Список привычек')
+        await expect(page.locator('h2', has_text='Все привычки:')).to_be_visible()
         
-        # Создаём новую привычку (заполните селекторы под свои)
-        await page.click('#create-habit-button')
-        await page.fill('#habit-name', 'E2E Test Habit')
-        await page.fill('#habit-description', 'Created by E2E test')
-        await page.fill('#habit-goal', '100')
-        await page.fill('#habit-step', '10')
-        await page.click('#save-habit-button')
+        # Переходим на страницу создания новой привычки
+        await page.click('#create-button')
+        await expect(page.locator('h1', has_text='Создание привычки:')).to_be_visible()
+
+        # Создаём новую привычку
+        await page.fill('#name', 'E2E Test Habit2')
+        await page.fill('#description', 'Created by E2E test3')
+        await page.fill('#goal', '100')
+        await page.fill('#step', '10')
+        await page.click('#create-button')
         
         # Проверяем, что привычка создалась
-        await expect(page.locator('.habit-item')).to_contain_text('E2E Test Habit')
+        await page.goto(f'{live_server}/habits/main')
+        await page.wait_for_timeout(2000)
+        await expect(page.locator('h2', has_text='Все привычки:')).to_be_visible()
+        tbody = page.locator('#tbodyHabits')
+        await expect(tbody).to_contain_text('E2E Test Habit2', timeout=10000)
