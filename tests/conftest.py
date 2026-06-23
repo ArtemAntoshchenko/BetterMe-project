@@ -1,13 +1,12 @@
 import pytest
-import pytest_asyncio
 import asyncio
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncAttrs, async_sessionmaker
-from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column, relationship, sessionmaker
-from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, UniqueConstraint
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncAttrs
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker
+from sqlalchemy import String, Text, ForeignKey, UniqueConstraint
 from datetime import datetime
 from typing import Annotated
 from datetime import date
-from typing import List, AsyncGenerator, Dict, Any
+from typing import List
 from backend.DAO.dao_habits import HabitDAO
 from backend.DAO.dao_achievement import AchievementDAO
 from backend.DAO.dao_registration import UserDAO
@@ -31,19 +30,19 @@ def get_test_db_url():
     else:
         return "sqlite+aiosqlite:///:memory:"
 
-_engine = None
-_sessionmaker = None
-_test_db_file = None
+_engine=None
+_sessionmaker=None
+_test_db_file=None
 
 def get_engine():
     """Создаёт движок один раз с учётом типа тестов"""
     global _engine, _sessionmaker, _test_db_file
     if _engine is None:
         db_url=get_test_db_url()
-        if db_url.startswith("sqlite+aiosqlite:///") and db_url != "sqlite+aiosqlite:///:memory:":
-            _test_db_file = db_url.replace("sqlite+aiosqlite:///", "")
-        _engine = create_async_engine(db_url, echo=False)
-        _sessionmaker = sessionmaker(_engine, class_=AsyncSession, expire_on_commit=False)
+        if db_url.startswith("sqlite+aiosqlite:///") and db_url!="sqlite+aiosqlite:///:memory:":
+            _test_db_file=db_url.replace("sqlite+aiosqlite:///", "")
+        _engine=create_async_engine(db_url, echo=False)
+        _sessionmaker=sessionmaker(_engine, class_=AsyncSession, expire_on_commit=False)
     return _engine, _sessionmaker
 
 created_at=Annotated[datetime, mapped_column(server_default=func.now())]
@@ -371,14 +370,11 @@ def switch_to_test_models():
     if os.environ.get('E2E_TESTING') == 'true':
         from backend.DAO.dao_habits import HabitDAO
 
-        # Сохраняем оригинальные модели
         original_habit_model = HabitDAO.model
 
-        # Подменяем на тестовые
         HabitDAO.model = HabitTest
         yield
         
-        # Восстанавливаем
         HabitDAO.model = original_habit_model
     else:
         yield
@@ -400,12 +396,10 @@ async def live_server():
     server = uvicorn.Server(config)
     task = asyncio.create_task(server.serve())
     
-    # Увеличиваем время ожидания запуска сервера
     await asyncio.sleep(3)
     
-    # Проверяем, что сервер действительно запустился
     async with httpx.AsyncClient() as client:
-        for i in range(15):  # Увеличил количество попыток
+        for i in range(15):
             try:
                 await client.get("http://127.0.0.1:8888")
                 break
@@ -428,22 +422,18 @@ async def live_server():
 @pytest.fixture(scope="function")
 async def e2e_client(live_server):
     """HTTP клиент для прямых API вызовов в E2E тестах"""
-    # Добавляем небольшую задержку перед созданием клиента
     await asyncio.sleep(0.5)
-    async with AsyncClient(base_url=live_server, timeout=30.0) as client:  # Увеличил таймаут
+    async with AsyncClient(base_url=live_server, timeout=30.0) as client: 
         yield client
 
 @pytest.fixture(scope="function")
 async def authenticated_user_e2e(e2e_client, live_server):
     """Создаёт авторизованного пользователя через API для E2E тестов"""
     import time
-    
-    # Небольшая задержка
     await asyncio.sleep(0.5)
     
     timestamp = int(time.time())
     short_timestamp = str(timestamp)[-5:]
-    
     user_data = {
         "nickname": f"e2e_user_{short_timestamp}",
         "login": f"e2e_login_{short_timestamp}",
@@ -455,18 +445,13 @@ async def authenticated_user_e2e(e2e_client, live_server):
         "city": "Test City",
         "date_of_birth": "1990-01-01"
     }
-    
-    # Регистрация через API
     response = await e2e_client.post("/auth/registration", json=user_data)
     assert response.status_code == 200, f"Registration failed: {response.text}"
-    
-    # Вход через API
     response = await e2e_client.post("/auth/login", json={
         "login": user_data["login"],
         "password": user_data["password"]
     })
     assert response.status_code == 200, f"Login failed: {response.text}"
-    
     token = response.json()['access_token']
     user_data['token'] = token
     return user_data

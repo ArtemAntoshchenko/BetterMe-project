@@ -7,6 +7,7 @@
 [![Jinja](https://img.shields.io/badge/jinja-white.svg?style=for-the-badge&logo=jinja&logoColor=black)](https://jinja.palletsprojects.com/)
 [![Gunicorn](https://img.shields.io/badge/gunicorn-%298729.svg?style=for-the-badge&logo=gunicorn&logoColor=white)](https://gunicorn.org/)
 [![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)](https://nginx.org/)
+[![Pytest](https://img.shields.io/badge/pytest-%23ffffff.svg?style=for-the-badge&logo=pytest&logoColor=0a0a0a)](https://docs.pytest.org/)
 
 Учебный проект по созданию веб-сайта для закрепления полезных привычек **BetterMe**. Это мой первый большой REST API проект, построенный на современном асинхронном фреймворке FastAPI. Проект представляет собой полноценный сайт с возможностью регистрации, ведения списка привычек, отслеживания прогресса и получения достижений.
 
@@ -17,6 +18,7 @@
 - **📝 Работа с данными:** Валидация и сериализация данных осуществляется через Pydantic-схемы.
 - **📚 Документация:** Автоматически сгенерированная документация Swagger (OpenAPI) для всех эндпоинтов API.
 - **🌦️ Интеграция с внешним API:** Асинхронное подключение к погодному API с помощью библиотеки `aiohttp`.
+- **🧪 Тестирование:** Частичное покрытие тестами ключевых компонентов: unit и интеграционные тесты для проверки взаимодействия с БД, e2e-тесты для проверки пользовательского сценария регистрации на сайте.
 - **🐳 Контейнеризация:** Проект полностью упакован в Docker-контейнеры для простого и быстрого развертывания.
 
 ## Технологический стек
@@ -35,6 +37,11 @@
   - [Jinja2](https://jinja.palletsprojects.com/) — шаблонизатор для генерации HTML-страниц.
 - **База данных:**
   - [asyncpg (PostgreSQL)](https://github.com/MagicStack/asyncpg) — асинхронный драйвер для PostgreSQL.
+- **Тестирование:**
+  - [Pytest](https://docs.pytest.org/) — основной фреймворк для написания тестов.
+  - [pytest-asyncio](https://pytest-asyncio.readthedocs.io/) — поддержка асинхронных тестов.
+  - [httpx](https://www.python-httpx.org/) — асинхронный HTTP клиент для тестирования API.
+  - [pytest-env](https://pypi.org/project/pytest-env/) — управление переменными окружения в тестах.
 
 ## Запуск проекта
 
@@ -93,7 +100,6 @@
    Откройте браузер и перейдите по адресу:
    http://localhost:8000
 
-
 ## Документация API
 
 Структура проекта позволяет легко перемещаться по сайту через кнопки продвижения до регистрации, и через навигационное меню после регистрации и входа под своей учётной записью.
@@ -142,7 +148,7 @@ BetterMe/
 └── requirements.txt      # Зависимости проекта
 ```
 
-<img width="296" height="1038" alt="структура проекта" src="https://github.com/user-attachments/assets/269e4ea0-5638-4c41-930a-6df61de3ff0b" />
+<img width="350" height="872" alt="image" src="https://github.com/user-attachments/assets/6211521e-bd60-4007-89b2-bd8a7f2a3270" />
 
 ## Лицензия
 
